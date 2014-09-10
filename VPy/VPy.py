@@ -5,7 +5,7 @@ import json
 
 class Client():
     settings = configController.configClient("test") ##Default
-    api = slumber.API("https://api.validic.com/v1/",  append_slash = False)
+    api = slumber.API(settings.getApi(),  append_slash = False)
     orgId = settings.getOrgId() ##Default
     token = settings.getAccessToken() ##Default
     user = settings.getUser() ##Default
@@ -15,6 +15,9 @@ class Client():
         orgId = self.settings.getOrgId()
         token = self.settings.getAccessToken()
         user = self.settings.getUser()
+        self.orgId = self.settings.getOrgId()
+        self.token = self.settings.getAccessToken()
+        self.user = self.settings.getUser()
         return self.settings
 
     def getMyOrganizationInfo(self):
@@ -43,12 +46,6 @@ class Client():
     
     def suspendUser(self,userid):        
         response = self.api.organizations(self.orgId).users(userid).put({ "suspend": "1", "access_token": self.token })
-        return response
-
-    def addUser(self, userid):      
-        payload = {  "user": {    "uid": userid  },"access_token": self.settings.getAccessToken()}
-        cleanLoad = json.dumps(payload)
-        response = self.api.organizations(self.settings.getOrgId()).users.post(cleanLoad.replace("'",""))
         return response
 
     def getUserStorefrontUrl(self,token):
@@ -86,9 +83,40 @@ class Client():
         response = self.api.organizations(self.orgId).users(userid).tobacco_cessation.get(access_token = self.token)
         return response 
 
-    def unSuspendUser(self,studentId):        
-        response = self.api.organizations(self.orgId).users(studentId).put({ "suspend": "0", "access_token": self.token })
+    def unSuspendUser(self,userId):        
+        response = self.api.organizations(self.orgId).users(userId).put({ "suspend": "0", "access_token": self.token })
         return response
+
+    def deleteAllUsers(self):
+        response = self.getMyUsers()
+        for user in response["users"]:
+            self.deleteUser(user["_id"].encode('utf-8'))
+
+    def deleteUser(self, userId):
+        try:    
+            self.api.organizations(self.orgId).users(userId).delete(access_token = self.token)
+        except Exception:
+            pass
+        response = userId;
+
+    def addUser(self, userid):      
+        payload = {  "user": {    "uid": userid  },"access_token": self.settings.getAccessToken()}
+        response = self.api.organizations(self.settings.getOrgId()).users.post(payload)
+        return response
+
+    def addUserWithProfile(self, userid, gender, location, birthyear, height, weight):      
+        payload = {  "user": {    "uid": userid, "profile":{ "gender": gender, "location": location, "birth_year": birthyear, "height": height, "weight": weight } },"access_token": self.settings.getAccessToken()}
+        response = self.api.organizations(self.settings.getOrgId()).users.post(payload)
+        return response
+
+    def addFitness(self, userId,timestamp,utc_offset,type,intensity,start_time,distance,duration,calories,activity_id):
+        payload = {   "fitness":{ "timestamp": timestamp,"utc_offset": utc_offset,"type": type,"intensity": intensity,"start_time": start_time,"distance":distance,"duration": duration,"calories": calories,"activity_id": activity_id },"access_token": self.settings.getAccessToken()}
+        response = self.api.organizations(self.settings.getOrgId()).users(userId).fitness().post(payload)
+        return response
+
+    def addRoutine(self, userid, routine):
+        return true
+
 
         
     

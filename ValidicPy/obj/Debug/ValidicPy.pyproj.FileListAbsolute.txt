@@ -18,3 +18,5 @@ C:\Users\ShannonCode\Documents\Visual Studio 2013\Projects\ValidicPy\ValidicPy\b
 C:\Users\ShannonCode\Documents\Visual Studio 2013\Projects\ValidicPy\ValidicPy\bin\Microsoft.Web.Deployment.dll
 C:\Users\ShannonCode\Documents\Visual Studio 2013\Projects\ValidicPy\ValidicPy\bin\Microsoft.PythonTools.WebRole.dll
 C:\Users\ShannonCode\Documents\Visual Studio 2013\Projects\ValidicPy\ValidicPy\bin\wfastcgi.py
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\obj\Debug\AzureSetup.cfg
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\bin\AzureSetup.cfg

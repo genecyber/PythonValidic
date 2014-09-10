@@ -8,6 +8,8 @@ import requests
 import slumber
 import slumber.serialize
 from VPy import Client
+import Routine
+from Activity import Routine
 
 class ValidicSpecificTests(unittest.TestCase):
     #===============Settings
@@ -71,11 +73,7 @@ class ValidicSpecificTests(unittest.TestCase):
         self.assertIsNotNone(response)
         self.assertEqual(response["message"].encode('utf-8'),"The user has been unsuspended successfully")
 
-    def test_Client_ProvisionUser(self):
-        self.client.init("live")
-        uid = "testUIDuid"
-        response = self.client.addUser(uid)
-        self.client.init("test")
+    
 
     def test_Client_StorefrontUrl(self):
         response = self.client.refreshUserAccessToken(self.user)
@@ -128,6 +126,67 @@ class ValidicSpecificTests(unittest.TestCase):
     def test_Client_getTobaccoCessation(self):
         response = self.client.getTobaccoCessation(self.user)
         self.assertIsNotNone(response)
+class ValidicAddTests(unittest.TestCase):
+     #===============Settings
+    client = Client()    
+    settings = client.init("enterprise")
+    api =  slumber.API("https://api.validic.com/v1/")
+    orgId = settings.getOrgId()
+    token = settings.getAccessToken()
+    user = settings.getUser()
+
+    def setUp(self):
+        settings = self.client.init("enterprise")
+        self.client.deleteAllUsers()
+
+    def test_Client_ProvisionUser(self):
+        uid = "testUIDuid"
+        response = self.client.addUser(uid)
+
+    def test_Client_ProvisionUserAndProfile(self):
+        uid = "fooId"
+        gender= "M"
+        location = "NC"
+        birthyear = "1980"
+        height = 4
+        weight = 5
+        response = self.client.addUserWithProfile(uid, gender, location, birthyear, height, weight)
+        self.assertEqual(response["user"]["profile"]["gender"].encode('utf-8'),gender);
+
+    def test_AddFitness(self):
+        uid = "fitness"
+        response = self.client.addUser(uid)
+        timestamp = "2013-03-10T07:12:16+00:00"
+        utc_offset = "-05:00"
+        type = "Running"
+        intensity = "medium"
+        start_time = "2013-03-09T02:12:16-05:00"
+        distance = 5149.9
+        duration = 1959
+        calories = 350
+        activity_id = "12345"
+        response = self.client.addFitness(response["user"]["_id"].encode('utf-8'), timestamp,utc_offset,type,intensity,start_time,distance,duration,calories,activity_id)
+        self.assertEqual(response["fitness"]["type"].encode('utf-8'),type);
+
+    def test_addRoutine(self):
+        routine = Routine()
+        routine.steps = 123
+        response = self.client.addFitness(response["user"]["_id"].encode('utf-8'), routine)
+        self.assertEqual(response["routine"]["timestamp"].encode('utf-8'),timestamp);
+
+    def test_addNutrition(self):
+        self.assertEqual(response["nutrition"]["timestamp"].encode('utf-8'),timestamp);
+    def test_addSleep(self):
+        self.assertEqual(response["sleep"]["timestamp"].encode('utf-8'),timestamp);
+    def test_addWeight(self):
+        self.assertEqual(response["weight"]["timestamp"].encode('utf-8'),timestamp);
+    def test_addDiabetes(self):
+        self.assertEqual(response["diabetes"]["timestamp"].encode('utf-8'),timestamp);
+    def test_addBiometric(self):
+        self.assertEqual(response["biometrics"]["timestamp"].encode('utf-8'),timestamp);
+    def test_addTobacco(self):
+        self.assertEqual(response["tobacco_cessation"]["timestamp"].encode('utf-8'),timestamp);
+
 
 class UtilsTests(unittest.TestCase):
     client = Client()    

@@ -19,4 +19,7 @@ class configClient(object):
     def getUser(this):
         return this.config.get('Credentials',this.mode+'userid')
 
+    def getApi(this):
+        return this.config.get('API',this.mode+'baseurl')
+
 

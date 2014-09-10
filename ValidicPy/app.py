@@ -1,6 +1,4 @@
 from flask import Flask
-import ValidicPyLibrary
-from ValidicPyLibrary import ValidicClient
 app = Flask(__name__)
 
 # Make the WSGI interface available at the top level so wfastcgi can get it.

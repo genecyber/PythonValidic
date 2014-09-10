@@ -26,7 +26,7 @@
   <ItemGroup>
     <Compile Include="configController.py" />
     <Compile Include="configWriter.py" />
-    <Compile Include="Model\Summary.py" />
+    <Compile Include="Routine.py" />
     <Compile Include="tests.py" />
     <Compile Include="VPy.py" />
   </ItemGroup>
@@ -35,9 +35,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="settings.cfg" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Model\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
