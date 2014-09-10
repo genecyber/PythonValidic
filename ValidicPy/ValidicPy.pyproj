@@ -15,6 +15,7 @@
     <OutputPath>.</OutputPath>
     <Name>ValidicPy</Name>
     <RootNamespace>ValidicPy</RootNamespace>
+    <PythonWsgiHandler>{StartupModule}.wsgi_app</PythonWsgiHandler>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,7 +38,7 @@
       <FriendlyName>Python 2.7</FriendlyName>
     </WebPiReference>
   </ItemGroup>
-  <Import Project="$(VSToolsPath)\Python Tools\Microsoft.PythonTools.Flask.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <ProjectExtensions>
     <VisualStudio>
       <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
