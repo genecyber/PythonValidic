@@ -32,7 +32,7 @@ try:
 except ImportError:
     from _thread import start_new_thread
 
-__version__ = '2.1.0'
+__version__ = '2.1.1'
 
 # http://www.fastcgi.com/devkit/doc/fcgi-spec.html#S3
 
@@ -487,7 +487,8 @@ def start_file_watcher(path, restartRegex):
                 cur_pointer = ctypes.addressof(buffer)
                 while True:
                     fni = ctypes.cast(cur_pointer, ctypes.POINTER(FILE_NOTIFY_INFORMATION))
-                    filename = ctypes.wstring_at(cur_pointer + 12)
+                    # FileName is not null-terminated, so specifying length is mandatory.
+                    filename = ctypes.wstring_at(cur_pointer + 12, fni.contents.FileNameLength // 2)
                     yield filename
                     if fni.contents.NextEntryOffset == 0:
                         break
@@ -702,6 +703,7 @@ def main():
                     log('wfastcgi.py %s initializing' % __version__)
 
                     os.chdir(response.physical_path)
+                    sys.path[0] = '.'
 
                     # Initialization errors should be treated as fatal.
                     response.fatal_errors = True

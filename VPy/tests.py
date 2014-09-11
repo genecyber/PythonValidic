@@ -8,8 +8,16 @@ import requests
 import slumber
 import slumber.serialize
 from VPy import Client
-import Routine
+import Activity
+from Activity import Profile
+from Activity import Fitness
 from Activity import Routine
+from Activity import Nutrition
+from Activity import Sleep
+from Activity import Weight
+from Activity import Diabetes
+from Activity import Biometrics
+from Activity import TobaccoCessation
 
 class ValidicSpecificTests(unittest.TestCase):
     #===============Settings
@@ -22,6 +30,8 @@ class ValidicSpecificTests(unittest.TestCase):
 
     def setUp(self):
         self.base_resource = slumber.Resource(base_url="http://api.validic.com/api/v1/organizations/"+ self.settings.getOrgId(), format="json", append_slash=False, access_token = self.settings.getAccessToken())
+        settings = self.client.init("enterprise")
+        self.client.deleteAllUsers()
 
     def test_OrganizationInfoQuery(self):
         resp = self.api.organizations(self.orgId).get(access_token = self.token)
@@ -32,98 +42,125 @@ class ValidicSpecificTests(unittest.TestCase):
         self.client.init("live")
         resp = self.api.organizations(self.orgId).get(access_token = self.token)
         if (self.settings.mode == "live"):
-            self.assertEqual(resp["organization"]["name"].encode('utf-8') ,'API Wrapper Sandbox')
+            self.assertEqual(resp["organization"]["name"].encode('utf-8') ,'Shannon Code Partner')
 
     def test_Client_MyOrganizationInfoQuery(self):
         resp = self.client.getMyOrganizationInfo()
         if (self.settings.mode == "test"):
-            self.assertEqual(resp["organization"]["name"].encode('utf-8') ,'ACME Corp')
+            self.assertEqual(resp["organization"]["name"].encode('utf-8') ,'Shannon Code Partner')
 
     def test_Client_MyOrganizationInfoQuery_Live(self):
         self.client.init("live")
         resp = self.client.getMyOrganizationInfo()
         if (self.settings.mode == "live"):
-            self.assertEqual(resp["organization"]["name"].encode('utf-8') ,'API Wrapper Sandbox')
+            self.assertEqual(resp["organization"]["name"].encode('utf-8') ,'Shannon Code Partner')
 
     def test_UsersQuery(self):
         resp = self.api.organizations(self.orgId).users.get(access_token = self.token)
         self.assertGreater(len(resp["users"]),1)
 
-    def test_Client_UsersQuery(self):
+    def test_Client_UsersQuery(self):    
+        settings = self.client.init("enterprise")
+        userResponse = self.client.addUser("query2")
+        userResponse = self.client.addUser("query3")
+        userResponse = self.client.addUser("query0")
         resp = self.client.getMyUsers()
         self.user = resp["users"][0]["_id"]
         self.assertGreater(len(resp["users"]),1)
 
-    def test_Client_UserQuery(self):        
-        response = self.client.getUser(self.user)
+    def test_Client_UserQuery(self):
+        userResponse = self.client.addUser("query")
+        response = self.client.getUser(userResponse["user"]["_id"])
         self.assertIsNotNone(response)
 
     def test_Client_ResetUserToken(self):
-        response = self.client.refreshUserAccessToken(self.user)
+        userResponse = self.client.addUser("reset")
+        response = self.client.refreshUserAccessToken(userResponse["user"]["_id"])
         self.assertIsNotNone(response)
-        self.assertEqual(response["_id"].encode('utf-8'),self.user)
+        self.assertEqual(response["uid"].encode('utf-8'),"reset")
 
-    def test_Client_SuspendUser(self):        
-        response = self.client.suspendUser(self.user)
+    def test_Client_SuspendUser(self):   
+        userResponse = self.client.addUser("unsuspend")     
+        response = self.client.suspendUser(userResponse["user"]["_id"])   
         self.assertIsNotNone(response)
         self.assertEqual(response["message"].encode('utf-8'),"The user has been suspended successfully")
 
-    def test_Client_UnSuspendUser(self):        
-        response = self.client.unSuspendUser(self.user)
+    def test_Client_UnSuspendUser(self):     
+        userResponse = self.client.addUser("unsuspend")
+        response = self.client.unSuspendUser(userResponse["user"]["_id"])   
         self.assertIsNotNone(response)
-        self.assertEqual(response["message"].encode('utf-8'),"The user has been unsuspended successfully")
-
-    
+        self.assertEqual(response["message"].encode('utf-8'),"The user has been unsuspended successfully")    
 
     def test_Client_StorefrontUrl(self):
-        response = self.client.refreshUserAccessToken(self.user)
+        settings = self.client.init("enterprise")
+        userResponse = self.client.addUser("profile")
+        response = self.client.refreshUserAccessToken(userResponse["user"]["_id"])
+
         self.assertIsNotNone(response)
         token = response["authentication_token"]
         response = self.client.getUserStorefrontUrl(token)
-        expected = "https://app.validic.com/51aca5a06dedda916400002b/"+token.encode('utf-8')
+        expected = "https://app.validic.com/"+settings.getOrgId()+"/"+token.encode('utf-8')
         self.assertEqual(response.encode('utf-8'),expected)
     
     def test_Client_UserProfile(self):
         #Note: Sending both the org token and the user access token returns weird profiles
-        tokenresp = self.client.refreshUserAccessToken(self.user)
+
+        userResponse = self.client.addUser("profile")
+        response = self.client.getUser(userResponse["user"]["_id"])
+
+        tokenresp = self.client.refreshUserAccessToken(userResponse["user"]["_id"])
+        userResponse = self.client.addUser("reset")
+        response = self.client.getUser(userResponse["user"]["_id"])
         token = tokenresp["authentication_token"].encode('utf-8')
         profileresp = self.client.getUserProfile(token)
         self.assertIsNotNone(profileresp)
-        self.assertEqual(self.user,profileresp["_id"])
+        self.assertEqual(profileresp["uid"],"profile")
 
     def test_Client_getFitness(self):
-        response = self.client.getFitness(self.user)
-        self.assertIsNotNone(response)
-
-    def test_Client_getFitness(self):
+        response = self.client.addUser("activity")
+        self.user = response["user"]["_id"]
         response = self.client.getFitness(self.user)
         self.assertIsNotNone(response)
 
     def test_Client_getRoutine(self):
+        response = self.client.addUser("activity")
+        self.user = response["user"]["_id"]
         response = self.client.getRoutine(self.user)
         self.assertIsNotNone(response)
 
     def test_Client_getNutrition(self):
+        response = self.client.addUser("activity")
+        self.user = response["user"]["_id"]
         response = self.client.getNutrition(self.user)
         self.assertIsNotNone(response)
 
     def test_Client_getSleep(self):
+        response = self.client.addUser("activity")
+        self.user = response["user"]["_id"]
         response = self.client.getSleep(self.user)
         self.assertIsNotNone(response)
 
     def test_Client_getWeight(self):
+        response = self.client.addUser("activity")
+        self.user = response["user"]["_id"]
         response = self.client.getWeight(self.user)
         self.assertIsNotNone(response)
 
     def test_Client_getDiabetesMeasurements(self):
+        response = self.client.addUser("activity")
+        self.user = response["user"]["_id"]
         response = self.client.getDiabetesMeasurements(self.user)
         self.assertIsNotNone(response)
 
     def test_Client_getBiometricMeasurements(self):
+        response = self.client.addUser("activity")
+        self.user = response["user"]["_id"]
         response = self.client.getBiometricMeasurements(self.user)
         self.assertIsNotNone(response)
 
     def test_Client_getTobaccoCessation(self):
+        response = self.client.addUser("activity")
+        self.user = response["user"]["_id"]
         response = self.client.getTobaccoCessation(self.user)
         self.assertIsNotNone(response)
 class ValidicAddTests(unittest.TestCase):
@@ -145,49 +182,59 @@ class ValidicAddTests(unittest.TestCase):
 
     def test_Client_ProvisionUserAndProfile(self):
         uid = "fooId"
-        gender= "M"
-        location = "NC"
-        birthyear = "1980"
-        height = 4
-        weight = 5
-        response = self.client.addUserWithProfile(uid, gender, location, birthyear, height, weight)
-        self.assertEqual(response["user"]["profile"]["gender"].encode('utf-8'),gender);
+        profile = Profile()    
+        profile.gender = "F"   
+        response = self.client.addUserWithProfile(uid, profile)
+        self.assertEqual(response["user"]["profile"]["gender"].encode('utf-8'),"F")
 
-    def test_AddFitness(self):
-        uid = "fitness"
-        response = self.client.addUser(uid)
-        timestamp = "2013-03-10T07:12:16+00:00"
-        utc_offset = "-05:00"
-        type = "Running"
-        intensity = "medium"
-        start_time = "2013-03-09T02:12:16-05:00"
-        distance = 5149.9
-        duration = 1959
-        calories = 350
-        activity_id = "12345"
-        response = self.client.addFitness(response["user"]["_id"].encode('utf-8'), timestamp,utc_offset,type,intensity,start_time,distance,duration,calories,activity_id)
-        self.assertEqual(response["fitness"]["type"].encode('utf-8'),type);
+    def test_addFitness(self):
+        response = self.client.addUser("fitness")
+        fitness = Fitness()
+        response = self.client.addFitness(response["user"]["_id"].encode('utf-8'),fitness)
+        self.assertEqual(response["fitness"]["type"].encode('utf-8'),fitness.type)
 
     def test_addRoutine(self):
+        response = self.client.addUser("routine")
         routine = Routine()
-        routine.steps = 123
-        response = self.client.addFitness(response["user"]["_id"].encode('utf-8'), routine)
-        self.assertEqual(response["routine"]["timestamp"].encode('utf-8'),timestamp);
+        routine.floors = 16
+        response = self.client.addRoutine(response["user"]["_id"].encode('utf-8'), routine)
+        self.assertEqual(response["routine"]["floors"],16)
 
     def test_addNutrition(self):
-        self.assertEqual(response["nutrition"]["timestamp"].encode('utf-8'),timestamp);
+        response = self.client.addUser("nutrition")
+        nutrition = Nutrition()
+        response = self.client.addNutrition(response["user"]["_id"].encode('utf-8'), nutrition)
+        self.assertEqual(response["nutrition"]["timestamp"].encode('utf-8'),nutrition.timestamp)
+
     def test_addSleep(self):
-        self.assertEqual(response["sleep"]["timestamp"].encode('utf-8'),timestamp);
+        response = self.client.addUser("sleep")
+        sleep = Sleep()
+        response = self.client.addSleep(response["user"]["_id"].encode('utf-8'), sleep)
+        self.assertEqual(response["sleep"]["timestamp"].encode('utf-8'),sleep.timestamp)
+
     def test_addWeight(self):
-        self.assertEqual(response["weight"]["timestamp"].encode('utf-8'),timestamp);
+        response = self.client.addUser("weight")
+        weight = Weight()
+        response = self.client.addWeight(response["user"]["_id"].encode('utf-8'), weight)
+        self.assertEqual(response["weight"]["timestamp"].encode('utf-8'),weight.timestamp)
+
     def test_addDiabetes(self):
-        self.assertEqual(response["diabetes"]["timestamp"].encode('utf-8'),timestamp);
-    def test_addBiometric(self):
-        self.assertEqual(response["biometrics"]["timestamp"].encode('utf-8'),timestamp);
+        response = self.client.addUser("diabetes")
+        diabetes = Diabetes()
+        response = self.client.addDiabetes(response["user"]["_id"].encode('utf-8'), diabetes)
+        self.assertEqual(response["diabetes"]["timestamp"].encode('utf-8'),diabetes.timestamp)
+
+    def test_addBiometrics(self):
+        response = self.client.addUser("biometrics")
+        biometrics = Biometrics()
+        response = self.client.addBiometrics(response["user"]["_id"].encode('utf-8'), biometrics)
+        self.assertEqual(response["biometrics"]["timestamp"].encode('utf-8'),biometrics.timestamp)
+
     def test_addTobacco(self):
-        self.assertEqual(response["tobacco_cessation"]["timestamp"].encode('utf-8'),timestamp);
-
-
+        response = self.client.addUser("tobacco_cessation")
+        tobacco_cessation = TobaccoCessation()
+        response = self.client.addTobaccoCessation(response["user"]["_id"].encode('utf-8'), tobacco_cessation)
+        self.assertEqual(response["tobacco_cessation"]["timestamp"].encode('utf-8'),tobacco_cessation.timestamp)
 class UtilsTests(unittest.TestCase):
     client = Client()    
     settings = client.init("test")

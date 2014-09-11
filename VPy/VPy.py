@@ -90,7 +90,11 @@ class Client():
     def deleteAllUsers(self):
         response = self.getMyUsers()
         for user in response["users"]:
-            self.deleteUser(user["_id"].encode('utf-8'))
+            try:
+                self.deleteUser(user["_id"].encode('utf-8'))
+            except Exception: 
+                continue #Probably trying to delete a user that cannot be deleted so lets skip
+        
 
     def deleteUser(self, userId):
         try:    
@@ -100,22 +104,55 @@ class Client():
         response = userId;
 
     def addUser(self, userid):      
-        payload = {  "user": {    "uid": userid  },"access_token": self.settings.getAccessToken()}
+        payload = {  "user": { "uid": userid  },"access_token": self.settings.getAccessToken()}
         response = self.api.organizations(self.settings.getOrgId()).users.post(payload)
         return response
 
-    def addUserWithProfile(self, userid, gender, location, birthyear, height, weight):      
-        payload = {  "user": {    "uid": userid, "profile":{ "gender": gender, "location": location, "birth_year": birthyear, "height": height, "weight": weight } },"access_token": self.settings.getAccessToken()}
+    def addUserWithProfile(self, userid, profile):      
+        payload = {  "user": { "uid": userid, "profile":{ "gender": profile.gender, "location": profile.location, "birth_year": profile.birthyear, "height": profile.height, "weight": profile.weight } },"access_token": self.settings.getAccessToken()}
         response = self.api.organizations(self.settings.getOrgId()).users.post(payload)
         return response
 
-    def addFitness(self, userId,timestamp,utc_offset,type,intensity,start_time,distance,duration,calories,activity_id):
-        payload = {   "fitness":{ "timestamp": timestamp,"utc_offset": utc_offset,"type": type,"intensity": intensity,"start_time": start_time,"distance":distance,"duration": duration,"calories": calories,"activity_id": activity_id },"access_token": self.settings.getAccessToken()}
+    def addFitness(self, userId, fitness):
+        payload = { "fitness":{ "timestamp": fitness.timestamp,"utc_offset": fitness.utc_offset, "type": fitness.type, "intensity": fitness.intensity,"start_time": fitness.start_time,"distance": fitness.distance,"duration": fitness.duration,"calories": fitness.calories,"activity_id": fitness.activity_id },"access_token": self.settings.getAccessToken()}
         response = self.api.organizations(self.settings.getOrgId()).users(userId).fitness().post(payload)
         return response
 
     def addRoutine(self, userid, routine):
-        return true
+        payload = { "routine":{ "timestamp": routine.timestamp, "utc_offset": routine.utc_offset, "steps": routine.steps, "distance": routine.distance, "floors": routine.floors, "elevation": routine.elevation, "calories_burned": routine.calories_burned, "activity_id": routine.activity_id },"access_token": self.settings.getAccessToken()}
+        response = self.api.organizations(self.settings.getOrgId()).users(userid).routine().post(payload)
+        return response
+
+    def addNutrition(self, userid, nutrition):
+        payload = { "nutrition":{ "timestamp": nutrition.timestamp, "utc_offset": nutrition.utc_offset, "calories": nutrition.calories, "carbohydrates": nutrition.carbohydrates, "fat": nutrition.fat, "fiber": nutrition.fiber, "protein": nutrition.protein, "sodium": nutrition.sodium, "water": nutrition.water, "meal": nutrition.meal, "entry_id": nutrition.entry_id },"access_token": self.settings.getAccessToken()}
+        response = self.api.organizations(self.settings.getOrgId()).users(userid).nutrition().post(payload)
+        return response
+    
+    def addSleep(self, userid, sleep):
+        payload = { "sleep":{ "timestamp": sleep.timestamp, "utc_offset": sleep.utc_offset, "total_sleep": sleep.total_sleep, "awake": sleep.awake, "deep": sleep.deep, "light": sleep.light, "rem": sleep.rem, "times_woken": sleep.times_woken, "activity_id": sleep.activity_id },"access_token": self.settings.getAccessToken()}
+        response = self.api.organizations(self.settings.getOrgId()).users(userid).sleep().post(payload)
+        return response
+    
+    def addWeight(self, userid, weight):
+        payload = { "weight":{ "timestamp": weight.timestamp, "utc_offset": weight.utc_offset, "weight": weight.weight, "height": weight.height, "free_mass": weight.free_mass, "fat_percent": weight.fat_percent, "mass_weight": weight.mass_weight, "bmi": weight.bmi, "data_id": weight.data_id },"access_token": self.settings.getAccessToken()}
+        response = self.api.organizations(self.settings.getOrgId()).users(userid).weight().post(payload)
+        return response
+    
+    def addDiabetes(self, userid, diabetes):
+        payload = { "diabetes":{ "timestamp": diabetes.timestamp, "utc_offset": diabetes.utc_offset, "c_peptide": diabetes.c_peptide, "fasting_plasma_glucose_test": diabetes.fasting_plasma_glucose_test, "hba1c": diabetes.hba1c, "insulin": diabetes.insulin, "oral_glucose_tolerance_test": diabetes.oral_glucose_tolerance_test, "random_plasma_glucose_test": diabetes.random_plasma_glucose_test, "triglyceride": diabetes.triglyceride, "blood_glucose": diabetes.blood_glucose, "activity_id": diabetes.activity_id },"access_token": self.settings.getAccessToken()}
+        response = self.api.organizations(self.settings.getOrgId()).users(userid).diabetes().post(payload)
+        return response
+    
+    def addBiometrics(self, userid, biometrics):
+        payload = { "biometrics":{  "timestamp": biometrics.timestamp, "utc_offset": biometrics.utc_offset, "blood_calcium": biometrics.blood_calcium, "blood_chromium": biometrics.blood_chromium, "blood_folic_acid": biometrics.blood_folic_acid, "blood_magnesium": biometrics.blood_magnesium, "blood_potassium": biometrics.blood_potassium, "blood_sodium": biometrics.blood_sodium, "blood_vitamin_b12": biometrics.blood_vitamin_b12, "blood_zinc": biometrics.blood_zinc, "creatine_kinase": biometrics.creatine_kinase, "crp": biometrics.crp, "diastolic": biometrics.diastolic, "ferritin": biometrics.ferritin,"hdl": biometrics.hdl, "hscrp": biometrics.hscrp, "il6": biometrics.il6, "ldl": biometrics.ldl, "resting_heartrate": biometrics.resting_heartrate, "systolic": biometrics.systolic, "testosterone": biometrics.testosterone, "total_cholesterol": biometrics.total_cholesterol, "tsh": biometrics.tsh,"uric_acid": biometrics.uric_acid,"vitamin_d": biometrics.vitamin_d,"white_cell_count": biometrics.white_cell_count,"spo2": biometrics.spo2,"temperature": biometrics.temperature,"data_id": biometrics.data_id },"access_token": self.settings.getAccessToken()}
+        response = self.api.organizations(self.settings.getOrgId()).users(userid).biometrics().post(payload)
+        return response
+    
+    def addTobaccoCessation(self, userid, tobacco_cessation):
+        payload = { "tobacco_cessation":{ "timestamp": tobacco_cessation.timestamp, "utc_offset": tobacco_cessation.utc_offset, "cigarettes_allowed": tobacco_cessation.cigarettes_allowed, "cigarettes_smoked": tobacco_cessation.cigarettes_smoked, "cravings": tobacco_cessation.cravings, "last_smoked": tobacco_cessation.last_smoked },"access_token": self.settings.getAccessToken()}
+        response = self.api.organizations(self.settings.getOrgId()).users(userid).tobacco_cessation().post(payload)
+        return response
+
 
 
         

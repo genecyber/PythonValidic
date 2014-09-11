@@ -18,5 +18,14 @@ C:\Users\ShannonCode\Documents\Visual Studio 2013\Projects\ValidicPy\ValidicPy\b
 C:\Users\ShannonCode\Documents\Visual Studio 2013\Projects\ValidicPy\ValidicPy\bin\Microsoft.Web.Deployment.dll
 C:\Users\ShannonCode\Documents\Visual Studio 2013\Projects\ValidicPy\ValidicPy\bin\Microsoft.PythonTools.WebRole.dll
 C:\Users\ShannonCode\Documents\Visual Studio 2013\Projects\ValidicPy\ValidicPy\bin\wfastcgi.py
-C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\obj\Debug\AzureSetup.cfg
 C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\bin\AzureSetup.cfg
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\obj\Debug\AzureSetup.cfg
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\bin\Microsoft.PythonTools.AzureSetup.exe
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\bin\Microsoft.PythonTools.AzureSetup.exe.config
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\bin\WebPICmdLine.exe
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\bin\WebPICmdLine.exe.config
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\bin\Microsoft.Web.PlatformInstaller.UI.dll
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\bin\Microsoft.Web.PlatformInstaller.dll
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\bin\Microsoft.Web.Deployment.dll
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\bin\Microsoft.PythonTools.WebRole.dll
+C:\cygwin\home\ShannonCode\repo\PythonValidic\ValidicPy\bin\wfastcgi.py
