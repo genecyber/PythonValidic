@@ -6,6 +6,7 @@ class Profile():
      birthyear = "1980"
      height = 4
      weight = 5
+     country = "USA"
 
 class Fitness():
     timestamp= "2013-03-10T07:12:16+00:00"

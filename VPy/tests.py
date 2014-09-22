@@ -19,7 +19,7 @@ from Activity import Diabetes
 from Activity import Biometrics
 from Activity import TobaccoCessation
 
-class ValidicSpecificTests(unittest.TestCase):
+class ValidicGetTests(unittest.TestCase):
     #===============Settings
     client = Client()    
     settings = client.init("test")
@@ -163,6 +163,7 @@ class ValidicSpecificTests(unittest.TestCase):
         self.user = response["user"]["_id"]
         response = self.client.getTobaccoCessation(self.user)
         self.assertIsNotNone(response)
+
 class ValidicAddTests(unittest.TestCase):
      #===============Settings
     client = Client()    
@@ -235,6 +236,158 @@ class ValidicAddTests(unittest.TestCase):
         tobacco_cessation = TobaccoCessation()
         response = self.client.addTobaccoCessation(response["user"]["_id"].encode('utf-8'), tobacco_cessation)
         self.assertEqual(response["tobacco_cessation"]["timestamp"].encode('utf-8'),tobacco_cessation.timestamp)
+
+class ValidicUpdateTests(unittest.TestCase):
+     #===============Settings
+    client = Client()    
+    settings = client.init("enterprise")
+    api =  slumber.API("https://api.validic.com/v1/")
+    orgId = settings.getOrgId()
+    token = settings.getAccessToken()
+    user = settings.getUser()
+
+    def setUp(self):
+        settings = self.client.init("enterprise")
+        self.client.deleteAllUsers()
+
+    def test_update_deleteFitness(self):
+        userresponse = self.client.addUser("fitness")
+        fitness = Fitness()
+        response = self.client.addFitness(userresponse["user"]["_id"].encode('utf-8'),fitness)
+        self.assertEqual(response["fitness"]["type"].encode('utf-8'),fitness.type)
+        #update
+        fitness.type = "Walking";
+        response = self.client.updateFitness(userresponse["user"]["_id"].encode('utf-8'),fitness,response["fitness"]["_id"])
+        self.assertEqual(response["fitness"]["type"].encode('utf-8'),"Walking")
+        #do a get to double check
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getFitness(userresponse["user"]["_id"])
+        self.assertEqual(getresponse["fitness"][0]["type"].encode('utf-8'),"Walking")
+        #delete
+        deleteresponse = self.client.deleteFitness(userresponse["user"]["_id"].encode('utf-8'),getresponse["fitness"][0]["_id"])
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getFitness(userresponse["user"]["_id"])
+
+    def test_update_deleteRoutine(self):
+        userresponse = self.client.addUser("routine")
+        activity = Routine()
+        response = self.client.addRoutine(userresponse["user"]["_id"].encode('utf-8'),activity)
+        self.assertEqual(response["routine"]["timestamp"].encode('utf-8'),activity.timestamp)
+        #update
+        activity.timestamp = "2013-03-10T07:15:16+00:00";
+        response = self.client.updateRoutine(userresponse["user"]["_id"].encode('utf-8'),activity,response["routine"]["_id"])
+        #do a get to double check
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getRoutine(userresponse["user"]["_id"])
+        self.assertEqual(getresponse["routine"][0]["timestamp"].encode('utf-8'),activity.timestamp)
+        #delete
+        deleteresponse = self.client.deleteRoutine(userresponse["user"]["_id"].encode('utf-8'),getresponse["routine"][0]["_id"])
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getRoutine(userresponse["user"]["_id"])
+
+    def test_update_deleteNutrition(self):
+        userresponse = self.client.addUser("nutrition")
+        activity = Nutrition()
+        response = self.client.addNutrition(userresponse["user"]["_id"].encode('utf-8'),activity)
+        self.assertEqual(response["nutrition"]["timestamp"].encode('utf-8'),activity.timestamp)
+        #update
+        activity.timestamp = "2013-03-10T07:15:16+00:00";
+        response = self.client.updateNutrition(userresponse["user"]["_id"].encode('utf-8'),activity,response["nutrition"]["_id"])
+        #do a get to double check
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getNutrition(userresponse["user"]["_id"])
+        self.assertEqual(getresponse["nutrition"][0]["timestamp"].encode('utf-8'),activity.timestamp)
+        #delete
+        deleteresponse = self.client.deleteNutrition(userresponse["user"]["_id"].encode('utf-8'),getresponse["nutrition"][0]["_id"])
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getNutrition(userresponse["user"]["_id"])
+
+
+    def test_update_deleteSleep(self):
+        userresponse = self.client.addUser("sleep")
+        activity = Sleep()
+        response = self.client.addSleep(userresponse["user"]["_id"].encode('utf-8'),activity)
+        self.assertEqual(response["sleep"]["timestamp"].encode('utf-8'),activity.timestamp)
+        #update
+        activity.timestamp = "2013-03-10T07:15:16+00:00";
+        response = self.client.updateSleep(userresponse["user"]["_id"].encode('utf-8'),activity,response["sleep"]["_id"])
+        #do a get to double check
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getSleep(userresponse["user"]["_id"])
+        self.assertEqual(getresponse["sleep"][0]["timestamp"].encode('utf-8'),activity.timestamp)
+        #delete
+        deleteresponse = self.client.deleteSleep(userresponse["user"]["_id"].encode('utf-8'),getresponse["sleep"][0]["_id"])
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getSleep(userresponse["user"]["_id"])
+
+    def test_update_deleteWeight(self):
+        userresponse = self.client.addUser("weight")
+        activity = Weight()
+        response = self.client.addWeight(userresponse["user"]["_id"].encode('utf-8'),activity)
+        self.assertEqual(response["weight"]["timestamp"].encode('utf-8'),activity.timestamp)
+        #update
+        activity.timestamp = "2013-03-10T07:15:16+00:00";
+        response = self.client.updateWeight(userresponse["user"]["_id"].encode('utf-8'),activity,response["weight"]["_id"])
+        #do a get to double check
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getWeight(userresponse["user"]["_id"])
+        self.assertEqual(getresponse["weight"][0]["timestamp"].encode('utf-8'),activity.timestamp)
+        #delete
+        deleteresponse = self.client.deleteWeight(userresponse["user"]["_id"].encode('utf-8'),getresponse["weight"][0]["_id"])
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getWeight(userresponse["user"]["_id"])
+
+    def test_update_delete_deleteDiabetes(self):
+        userresponse = self.client.addUser("diabetes")
+        activity = Diabetes()
+        response = self.client.addDiabetes(userresponse["user"]["_id"].encode('utf-8'),activity)
+        self.assertEqual(response["diabetes"]["timestamp"].encode('utf-8'),activity.timestamp)
+        #update
+        activity.timestamp = "2013-03-10T07:15:16+00:00";
+        response = self.client.updateDiabetes(userresponse["user"]["_id"].encode('utf-8'),activity,response["diabetes"]["_id"])
+        #do a get to double check
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getDiabetesMeasurements(userresponse["user"]["_id"])
+        self.assertEqual(getresponse["diabetes"][0]["timestamp"].encode('utf-8'),activity.timestamp)
+        #delete
+        deleteresponse = self.client.deleteDiabetes(userresponse["user"]["_id"].encode('utf-8'),getresponse["diabetes"][0]["_id"])
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getDiabetesMeasurements(userresponse["user"]["_id"])
+
+    def test_update_deleteBiometrics(self):
+        userresponse = self.client.addUser("biometrics")
+        activity = Biometrics()
+        response = self.client.addBiometrics(userresponse["user"]["_id"].encode('utf-8'),activity)
+        self.assertEqual(response["biometrics"]["timestamp"].encode('utf-8'),activity.timestamp)
+        #update
+        activity.timestamp = "2013-03-10T07:15:16+00:00";
+        response = self.client.updateBiometric(userresponse["user"]["_id"].encode('utf-8'),activity,response["biometrics"]["_id"])
+        #do a get to double check
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getBiometricMeasurements(userresponse["user"]["_id"])
+        self.assertEqual(getresponse["biometrics"][0]["timestamp"].encode('utf-8'),activity.timestamp)
+        #delete
+        deleteresponse = self.client.deleteBiometrics(userresponse["user"]["_id"].encode('utf-8'),getresponse["biometrics"][0]["_id"])
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getBiometricMeasurements(userresponse["user"]["_id"])
+
+    def test_update_deleteTobacco(self):
+        userresponse = self.client.addUser("tobacco_cessation")
+        activity = TobaccoCessation()
+        response = self.client.addTobaccoCessation(userresponse["user"]["_id"].encode('utf-8'),activity)
+        self.assertEqual(response["tobacco_cessation"]["timestamp"].encode('utf-8'),activity.timestamp)
+        #update
+        activity.timestamp = "2013-03-10T07:15:16+00:00";
+        response = self.client.updateTobaccoCessation(userresponse["user"]["_id"].encode('utf-8'),activity,response["tobacco_cessation"]["_id"])
+        #do a get to double check
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getTobaccoCessation(userresponse["user"]["_id"])
+        self.assertEqual(getresponse["tobacco_cessation"][0]["timestamp"].encode('utf-8'),activity.timestamp)
+        #delete
+        deleteresponse = self.client.deleteTobacco(userresponse["user"]["_id"].encode('utf-8'),getresponse["tobacco_cessation"][0]["_id"])
+        getresponse = self.client.Filtered(start_date = "2013-03-08T02:12:16-05:00").getTobaccoCessation(userresponse["user"]["_id"])
+
+
+
+
+class ValidicDeleteTests(unittest.TestCase):
+     #===============Settings
+    client = Client()    
+    settings = client.init("enterprise")
+    api =  slumber.API("https://api.validic.com/v1/")
+    orgId = settings.getOrgId()
+    token = settings.getAccessToken()
+    user = settings.getUser()
+
+    def setUp(self):
+        settings = self.client.init("enterprise")
+        self.client.deleteAllUsers()
+
 class UtilsTests(unittest.TestCase):
     client = Client()    
     settings = client.init("test")
@@ -293,6 +446,7 @@ class UtilsTests(unittest.TestCase):
         url = slumber.url_join("http://api.validic.com/", "t?st/".decode('utf8'))
         expected = "http://api.validic.com/t?st/".decode('utf8')
         self.assertEqual(url, expected)
+
 class ResourceTests(unittest.TestCase):
         client = Client()    
         settings = client.init("test")

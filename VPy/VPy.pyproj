@@ -27,6 +27,7 @@
     <Compile Include="configController.py" />
     <Compile Include="configWriter.py" />
     <Compile Include="Activity.py" />
+    <Compile Include="Filter.py" />
     <Compile Include="tests.py" />
     <Compile Include="VPy.py" />
   </ItemGroup>
