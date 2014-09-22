@@ -1,0 +1,783 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; VPy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="VPy 1.0 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">VPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <p>import unittest
+import slumber
+import mock
+import configController
+import slumber.serialize
+import unittest
+import requests
+import slumber
+import slumber.serialize
+from VPy import Client
+import Activity
+from Activity import Profile
+from Activity import Fitness
+from Activity import Routine
+from Activity import Nutrition
+from Activity import Sleep
+from Activity import Weight
+from Activity import Diabetes
+from Activity import Biometrics
+from Activity import TobaccoCessation</p>
+<dl class="docutils">
+<dt>class ValidicGetTests(unittest.TestCase):</dt>
+<dd><p class="first">#===============Settings
+client = Client()
+settings = client.init(&#8220;test&#8221;)
+api =  slumber.API(&#8220;<a class="reference external" href="https://api.validic.com/v1/">https://api.validic.com/v1/</a>&#8221;)
+orgId = settings.getOrgId()
+token = settings.getAccessToken()
+user = settings.getUser()</p>
+<dl class="last docutils">
+<dt>def setUp(self):</dt>
+<dd>self.base_resource = slumber.Resource(base_url=&#8221;<a class="reference external" href="http://api.validic.com/api/v1/organizations/">http://api.validic.com/api/v1/organizations/</a>&#8220;+ self.settings.getOrgId(), format=&#8221;json&#8221;, append_slash=False, access_token = self.settings.getAccessToken())
+settings = self.client.init(&#8220;enterprise&#8221;)
+self.client.deleteAllUsers()</dd>
+<dt>def test_OrganizationInfoQuery(self):</dt>
+<dd><p class="first">resp = self.api.organizations(self.orgId).get(access_token = self.token)
+if (self.settings.mode == &#8220;test&#8221;):</p>
+<blockquote class="last">
+<div>self.assertEqual(resp[&#8220;organization&#8221;][&#8220;name&#8221;].encode(&#8216;utf-8&#8217;) ,&#8217;ACME Corp&#8217;)</div></blockquote>
+</dd>
+<dt>def test_OrganizationInfoQuery_Live(self):</dt>
+<dd><p class="first">self.client.init(&#8220;live&#8221;)
+resp = self.api.organizations(self.orgId).get(access_token = self.token)
+if (self.settings.mode == &#8220;live&#8221;):</p>
+<blockquote class="last">
+<div>self.assertEqual(resp[&#8220;organization&#8221;][&#8220;name&#8221;].encode(&#8216;utf-8&#8217;) ,&#8217;Shannon Code Partner&#8217;)</div></blockquote>
+</dd>
+<dt>def test_Client_MyOrganizationInfoQuery(self):</dt>
+<dd><p class="first">resp = self.client.getMyOrganizationInfo()
+if (self.settings.mode == &#8220;test&#8221;):</p>
+<blockquote class="last">
+<div>self.assertEqual(resp[&#8220;organization&#8221;][&#8220;name&#8221;].encode(&#8216;utf-8&#8217;) ,&#8217;Shannon Code Partner&#8217;)</div></blockquote>
+</dd>
+<dt>def test_Client_MyOrganizationInfoQuery_Live(self):</dt>
+<dd><p class="first">self.client.init(&#8220;live&#8221;)
+resp = self.client.getMyOrganizationInfo()
+if (self.settings.mode == &#8220;live&#8221;):</p>
+<blockquote class="last">
+<div>self.assertEqual(resp[&#8220;organization&#8221;][&#8220;name&#8221;].encode(&#8216;utf-8&#8217;) ,&#8217;Shannon Code Partner&#8217;)</div></blockquote>
+</dd>
+<dt>def test_UsersQuery(self):</dt>
+<dd>resp = self.api.organizations(self.orgId).users.get(access_token = self.token)
+self.assertGreater(len(resp[&#8220;users&#8221;]),1)</dd>
+<dt>def test_Client_UsersQuery(self):</dt>
+<dd>settings = self.client.init(&#8220;enterprise&#8221;)
+userResponse = self.client.addUser(&#8220;query2&#8221;)
+userResponse = self.client.addUser(&#8220;query3&#8221;)
+userResponse = self.client.addUser(&#8220;query0&#8221;)
+resp = self.client.getMyUsers()
+self.user = resp[&#8220;users&#8221;][0][&#8220;_id&#8221;]
+self.assertGreater(len(resp[&#8220;users&#8221;]),1)</dd>
+<dt>def test_Client_UserQuery(self):</dt>
+<dd>userResponse = self.client.addUser(&#8220;query&#8221;)
+response = self.client.getUser(userResponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertIsNotNone(response)</dd>
+<dt>def test_Client_ResetUserToken(self):</dt>
+<dd>userResponse = self.client.addUser(&#8220;reset&#8221;)
+response = self.client.refreshUserAccessToken(userResponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertIsNotNone(response)
+self.assertEqual(response[&#8220;uid&#8221;].encode(&#8216;utf-8&#8217;),&#8221;reset&#8221;)</dd>
+<dt>def test_Client_SuspendUser(self):</dt>
+<dd>userResponse = self.client.addUser(&#8220;unsuspend&#8221;)
+response = self.client.suspendUser(userResponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertIsNotNone(response)
+self.assertEqual(response[&#8220;message&#8221;].encode(&#8216;utf-8&#8217;),&#8221;The user has been suspended successfully&#8221;)</dd>
+<dt>def test_Client_UnSuspendUser(self):</dt>
+<dd>userResponse = self.client.addUser(&#8220;unsuspend&#8221;)
+response = self.client.unSuspendUser(userResponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertIsNotNone(response)
+self.assertEqual(response[&#8220;message&#8221;].encode(&#8216;utf-8&#8217;),&#8221;The user has been unsuspended successfully&#8221;)</dd>
+<dt>def test_Client_StorefrontUrl(self):</dt>
+<dd><p class="first">settings = self.client.init(&#8220;enterprise&#8221;)
+userResponse = self.client.addUser(&#8220;profile&#8221;)
+response = self.client.refreshUserAccessToken(userResponse[&#8220;user&#8221;][&#8220;_id&#8221;])</p>
+<p class="last">self.assertIsNotNone(response)
+token = response[&#8220;authentication_token&#8221;]
+response = self.client.getUserStorefrontUrl(token)
+expected = &#8220;<a class="reference external" href="https://app.validic.com/">https://app.validic.com/</a>&#8220;+settings.getOrgId()+&#8221;/&#8221;+token.encode(&#8216;utf-8&#8217;)
+self.assertEqual(response.encode(&#8216;utf-8&#8217;),expected)</p>
+</dd>
+<dt>def test_Client_UserProfile(self):</dt>
+<dd><p class="first">#Note: Sending both the org token and the user access token returns weird profiles</p>
+<p>userResponse = self.client.addUser(&#8220;profile&#8221;)
+response = self.client.getUser(userResponse[&#8220;user&#8221;][&#8220;_id&#8221;])</p>
+<p class="last">tokenresp = self.client.refreshUserAccessToken(userResponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+userResponse = self.client.addUser(&#8220;reset&#8221;)
+response = self.client.getUser(userResponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+token = tokenresp[&#8220;authentication_token&#8221;].encode(&#8216;utf-8&#8217;)
+profileresp = self.client.getUserProfile(token)
+self.assertIsNotNone(profileresp)
+self.assertEqual(profileresp[&#8220;uid&#8221;],&#8221;profile&#8221;)</p>
+</dd>
+<dt>def test_Client_getFitness(self):</dt>
+<dd>response = self.client.addUser(&#8220;activity&#8221;)
+self.user = response[&#8220;user&#8221;][&#8220;_id&#8221;]
+response = self.client.getFitness(self.user)
+self.assertIsNotNone(response)</dd>
+<dt>def test_Client_getRoutine(self):</dt>
+<dd>response = self.client.addUser(&#8220;activity&#8221;)
+self.user = response[&#8220;user&#8221;][&#8220;_id&#8221;]
+response = self.client.getRoutine(self.user)
+self.assertIsNotNone(response)</dd>
+<dt>def test_Client_getNutrition(self):</dt>
+<dd>response = self.client.addUser(&#8220;activity&#8221;)
+self.user = response[&#8220;user&#8221;][&#8220;_id&#8221;]
+response = self.client.getNutrition(self.user)
+self.assertIsNotNone(response)</dd>
+<dt>def test_Client_getSleep(self):</dt>
+<dd>response = self.client.addUser(&#8220;activity&#8221;)
+self.user = response[&#8220;user&#8221;][&#8220;_id&#8221;]
+response = self.client.getSleep(self.user)
+self.assertIsNotNone(response)</dd>
+<dt>def test_Client_getWeight(self):</dt>
+<dd>response = self.client.addUser(&#8220;activity&#8221;)
+self.user = response[&#8220;user&#8221;][&#8220;_id&#8221;]
+response = self.client.getWeight(self.user)
+self.assertIsNotNone(response)</dd>
+<dt>def test_Client_getDiabetesMeasurements(self):</dt>
+<dd>response = self.client.addUser(&#8220;activity&#8221;)
+self.user = response[&#8220;user&#8221;][&#8220;_id&#8221;]
+response = self.client.getDiabetesMeasurements(self.user)
+self.assertIsNotNone(response)</dd>
+<dt>def test_Client_getBiometricMeasurements(self):</dt>
+<dd>response = self.client.addUser(&#8220;activity&#8221;)
+self.user = response[&#8220;user&#8221;][&#8220;_id&#8221;]
+response = self.client.getBiometricMeasurements(self.user)
+self.assertIsNotNone(response)</dd>
+<dt>def test_Client_getTobaccoCessation(self):</dt>
+<dd>response = self.client.addUser(&#8220;activity&#8221;)
+self.user = response[&#8220;user&#8221;][&#8220;_id&#8221;]
+response = self.client.getTobaccoCessation(self.user)
+self.assertIsNotNone(response)</dd>
+</dl>
+</dd>
+<dt>class ValidicAddTests(unittest.TestCase):</dt>
+<dd><blockquote class="first">
+<div>#===============Settings</div></blockquote>
+<p>client = Client()
+settings = client.init(&#8220;enterprise&#8221;)
+api =  slumber.API(&#8220;<a class="reference external" href="https://api.validic.com/v1/">https://api.validic.com/v1/</a>&#8221;)
+orgId = settings.getOrgId()
+token = settings.getAccessToken()
+user = settings.getUser()</p>
+<dl class="last docutils">
+<dt>def setUp(self):</dt>
+<dd>settings = self.client.init(&#8220;enterprise&#8221;)
+self.client.deleteAllUsers()</dd>
+<dt>def test_Client_ProvisionUser(self):</dt>
+<dd>uid = &#8220;testUIDuid&#8221;
+response = self.client.addUser(uid)</dd>
+<dt>def test_Client_ProvisionUserAndProfile(self):</dt>
+<dd>uid = &#8220;fooId&#8221;
+profile = Profile()
+profile.gender = &#8220;F&#8221;
+response = self.client.addUserWithProfile(uid, profile)
+self.assertEqual(response[&#8220;user&#8221;][&#8220;profile&#8221;][&#8220;gender&#8221;].encode(&#8216;utf-8&#8217;),&#8221;F&#8221;)</dd>
+<dt>def test_addFitness(self):</dt>
+<dd>response = self.client.addUser(&#8220;fitness&#8221;)
+fitness = Fitness()
+response = self.client.addFitness(response[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),fitness)
+self.assertEqual(response[&#8220;fitness&#8221;][&#8220;type&#8221;].encode(&#8216;utf-8&#8217;),fitness.type)</dd>
+<dt>def test_addRoutine(self):</dt>
+<dd>response = self.client.addUser(&#8220;routine&#8221;)
+routine = Routine()
+routine.floors = 16
+response = self.client.addRoutine(response[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;), routine)
+self.assertEqual(response[&#8220;routine&#8221;][&#8220;floors&#8221;],16)</dd>
+<dt>def test_addNutrition(self):</dt>
+<dd>response = self.client.addUser(&#8220;nutrition&#8221;)
+nutrition = Nutrition()
+response = self.client.addNutrition(response[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;), nutrition)
+self.assertEqual(response[&#8220;nutrition&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),nutrition.timestamp)</dd>
+<dt>def test_addSleep(self):</dt>
+<dd>response = self.client.addUser(&#8220;sleep&#8221;)
+sleep = Sleep()
+response = self.client.addSleep(response[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;), sleep)
+self.assertEqual(response[&#8220;sleep&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),sleep.timestamp)</dd>
+<dt>def test_addWeight(self):</dt>
+<dd>response = self.client.addUser(&#8220;weight&#8221;)
+weight = Weight()
+response = self.client.addWeight(response[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;), weight)
+self.assertEqual(response[&#8220;weight&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),weight.timestamp)</dd>
+<dt>def test_addDiabetes(self):</dt>
+<dd>response = self.client.addUser(&#8220;diabetes&#8221;)
+diabetes = Diabetes()
+response = self.client.addDiabetes(response[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;), diabetes)
+self.assertEqual(response[&#8220;diabetes&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),diabetes.timestamp)</dd>
+<dt>def test_addBiometrics(self):</dt>
+<dd>response = self.client.addUser(&#8220;biometrics&#8221;)
+biometrics = Biometrics()
+response = self.client.addBiometrics(response[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;), biometrics)
+self.assertEqual(response[&#8220;biometrics&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),biometrics.timestamp)</dd>
+<dt>def test_addTobacco(self):</dt>
+<dd>response = self.client.addUser(&#8220;tobacco_cessation&#8221;)
+tobacco_cessation = TobaccoCessation()
+response = self.client.addTobaccoCessation(response[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;), tobacco_cessation)
+self.assertEqual(response[&#8220;tobacco_cessation&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),tobacco_cessation.timestamp)</dd>
+</dl>
+</dd>
+<dt>class ValidicUpdateTests(unittest.TestCase):</dt>
+<dd><blockquote class="first">
+<div>#===============Settings</div></blockquote>
+<p>client = Client()
+settings = client.init(&#8220;enterprise&#8221;)
+api =  slumber.API(&#8220;<a class="reference external" href="https://api.validic.com/v1/">https://api.validic.com/v1/</a>&#8221;)
+orgId = settings.getOrgId()
+token = settings.getAccessToken()
+user = settings.getUser()</p>
+<dl class="last docutils">
+<dt>def setUp(self):</dt>
+<dd>settings = self.client.init(&#8220;enterprise&#8221;)
+self.client.deleteAllUsers()</dd>
+<dt>def test_update_deleteFitness(self):</dt>
+<dd>userresponse = self.client.addUser(&#8220;fitness&#8221;)
+fitness = Fitness()
+response = self.client.addFitness(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),fitness)
+self.assertEqual(response[&#8220;fitness&#8221;][&#8220;type&#8221;].encode(&#8216;utf-8&#8217;),fitness.type)
+#update
+fitness.type = &#8220;Walking&#8221;;
+response = self.client.updateFitness(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),fitness,response[&#8220;fitness&#8221;][&#8220;_id&#8221;])
+self.assertEqual(response[&#8220;fitness&#8221;][&#8220;type&#8221;].encode(&#8216;utf-8&#8217;),&#8221;Walking&#8221;)
+#do a get to double check
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getFitness(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertEqual(getresponse[&#8220;fitness&#8221;][0][&#8220;type&#8221;].encode(&#8216;utf-8&#8217;),&#8221;Walking&#8221;)
+#delete
+deleteresponse = self.client.deleteFitness(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),getresponse[&#8220;fitness&#8221;][0][&#8220;_id&#8221;])
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getFitness(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])</dd>
+<dt>def test_update_deleteRoutine(self):</dt>
+<dd>userresponse = self.client.addUser(&#8220;routine&#8221;)
+activity = Routine()
+response = self.client.addRoutine(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity)
+self.assertEqual(response[&#8220;routine&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#update
+activity.timestamp = &#8220;2013-03-10T07:15:16+00:00&#8221;;
+response = self.client.updateRoutine(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity,response[&#8220;routine&#8221;][&#8220;_id&#8221;])
+#do a get to double check
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getRoutine(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertEqual(getresponse[&#8220;routine&#8221;][0][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#delete
+deleteresponse = self.client.deleteRoutine(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),getresponse[&#8220;routine&#8221;][0][&#8220;_id&#8221;])
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getRoutine(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])</dd>
+<dt>def test_update_deleteNutrition(self):</dt>
+<dd>userresponse = self.client.addUser(&#8220;nutrition&#8221;)
+activity = Nutrition()
+response = self.client.addNutrition(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity)
+self.assertEqual(response[&#8220;nutrition&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#update
+activity.timestamp = &#8220;2013-03-10T07:15:16+00:00&#8221;;
+response = self.client.updateNutrition(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity,response[&#8220;nutrition&#8221;][&#8220;_id&#8221;])
+#do a get to double check
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getNutrition(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertEqual(getresponse[&#8220;nutrition&#8221;][0][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#delete
+deleteresponse = self.client.deleteNutrition(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),getresponse[&#8220;nutrition&#8221;][0][&#8220;_id&#8221;])
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getNutrition(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])</dd>
+<dt>def test_update_deleteSleep(self):</dt>
+<dd>userresponse = self.client.addUser(&#8220;sleep&#8221;)
+activity = Sleep()
+response = self.client.addSleep(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity)
+self.assertEqual(response[&#8220;sleep&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#update
+activity.timestamp = &#8220;2013-03-10T07:15:16+00:00&#8221;;
+response = self.client.updateSleep(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity,response[&#8220;sleep&#8221;][&#8220;_id&#8221;])
+#do a get to double check
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getSleep(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertEqual(getresponse[&#8220;sleep&#8221;][0][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#delete
+deleteresponse = self.client.deleteSleep(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),getresponse[&#8220;sleep&#8221;][0][&#8220;_id&#8221;])
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getSleep(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])</dd>
+<dt>def test_update_deleteWeight(self):</dt>
+<dd>userresponse = self.client.addUser(&#8220;weight&#8221;)
+activity = Weight()
+response = self.client.addWeight(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity)
+self.assertEqual(response[&#8220;weight&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#update
+activity.timestamp = &#8220;2013-03-10T07:15:16+00:00&#8221;;
+response = self.client.updateWeight(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity,response[&#8220;weight&#8221;][&#8220;_id&#8221;])
+#do a get to double check
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getWeight(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertEqual(getresponse[&#8220;weight&#8221;][0][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#delete
+deleteresponse = self.client.deleteWeight(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),getresponse[&#8220;weight&#8221;][0][&#8220;_id&#8221;])
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getWeight(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])</dd>
+<dt>def test_update_delete_deleteDiabetes(self):</dt>
+<dd>userresponse = self.client.addUser(&#8220;diabetes&#8221;)
+activity = Diabetes()
+response = self.client.addDiabetes(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity)
+self.assertEqual(response[&#8220;diabetes&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#update
+activity.timestamp = &#8220;2013-03-10T07:15:16+00:00&#8221;;
+response = self.client.updateDiabetes(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity,response[&#8220;diabetes&#8221;][&#8220;_id&#8221;])
+#do a get to double check
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getDiabetesMeasurements(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertEqual(getresponse[&#8220;diabetes&#8221;][0][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#delete
+deleteresponse = self.client.deleteDiabetes(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),getresponse[&#8220;diabetes&#8221;][0][&#8220;_id&#8221;])
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getDiabetesMeasurements(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])</dd>
+<dt>def test_update_deleteBiometrics(self):</dt>
+<dd>userresponse = self.client.addUser(&#8220;biometrics&#8221;)
+activity = Biometrics()
+response = self.client.addBiometrics(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity)
+self.assertEqual(response[&#8220;biometrics&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#update
+activity.timestamp = &#8220;2013-03-10T07:15:16+00:00&#8221;;
+response = self.client.updateBiometric(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity,response[&#8220;biometrics&#8221;][&#8220;_id&#8221;])
+#do a get to double check
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getBiometricMeasurements(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertEqual(getresponse[&#8220;biometrics&#8221;][0][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#delete
+deleteresponse = self.client.deleteBiometrics(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),getresponse[&#8220;biometrics&#8221;][0][&#8220;_id&#8221;])
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getBiometricMeasurements(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])</dd>
+<dt>def test_update_deleteTobacco(self):</dt>
+<dd>userresponse = self.client.addUser(&#8220;tobacco_cessation&#8221;)
+activity = TobaccoCessation()
+response = self.client.addTobaccoCessation(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity)
+self.assertEqual(response[&#8220;tobacco_cessation&#8221;][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#update
+activity.timestamp = &#8220;2013-03-10T07:15:16+00:00&#8221;;
+response = self.client.updateTobaccoCessation(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),activity,response[&#8220;tobacco_cessation&#8221;][&#8220;_id&#8221;])
+#do a get to double check
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getTobaccoCessation(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])
+self.assertEqual(getresponse[&#8220;tobacco_cessation&#8221;][0][&#8220;timestamp&#8221;].encode(&#8216;utf-8&#8217;),activity.timestamp)
+#delete
+deleteresponse = self.client.deleteTobacco(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;),getresponse[&#8220;tobacco_cessation&#8221;][0][&#8220;_id&#8221;])
+getresponse = self.client.Filtered(start_date = &#8220;2013-03-08T02:12:16-05:00&#8221;).getTobaccoCessation(userresponse[&#8220;user&#8221;][&#8220;_id&#8221;])</dd>
+</dl>
+</dd>
+<dt>class ValidicDeleteTests(unittest.TestCase):</dt>
+<dd><blockquote class="first">
+<div>#===============Settings</div></blockquote>
+<p>client = Client()
+settings = client.init(&#8220;enterprise&#8221;)
+api =  slumber.API(&#8220;<a class="reference external" href="https://api.validic.com/v1/">https://api.validic.com/v1/</a>&#8221;)
+orgId = settings.getOrgId()
+token = settings.getAccessToken()
+user = settings.getUser()</p>
+<dl class="last docutils">
+<dt>def setUp(self):</dt>
+<dd>settings = self.client.init(&#8220;enterprise&#8221;)
+self.client.deleteAllUsers()</dd>
+</dl>
+</dd>
+<dt>class UtilsTests(unittest.TestCase):</dt>
+<dd><p class="first">client = Client()
+settings = client.init(&#8220;test&#8221;)</p>
+<dl class="last docutils">
+<dt>def test_url_join_http(self):</dt>
+<dd><p class="first">self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com/">http://api.validic.com/</a>&#8221;), &#8220;<a class="reference external" href="http://api.validic.com/">http://api.validic.com/</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com/">http://api.validic.com/</a>&#8221;, &#8220;v1&#8221;), &#8220;<a class="reference external" href="http://api.validic.com/v1">http://api.validic.com/v1</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com/">http://api.validic.com/</a>&#8221;, &#8220;v1&#8221;, &#8220;organizations&#8221;), &#8220;<a class="reference external" href="http://api.validic.com/v1/organizations">http://api.validic.com/v1/organizations</a>&#8221;)</p>
+<p class="last">self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com">http://api.validic.com</a>&#8221;), &#8220;<a class="reference external" href="http://api.validic.com/">http://api.validic.com/</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com">http://api.validic.com</a>&#8221;, &#8220;v1&#8221;), &#8220;<a class="reference external" href="http://api.validic.com/v1">http://api.validic.com/v1</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com">http://api.validic.com</a>&#8221;, &#8220;v1&#8221;, &#8220;organizations&#8221;), &#8220;<a class="reference external" href="http://api.validic.com/v1/organizations">http://api.validic.com/v1/organizations</a>&#8221;)</p>
+</dd>
+<dt>def test_url_join_https(self):</dt>
+<dd><p class="first">self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="https://api.validic.com/">https://api.validic.com/</a>&#8221;), &#8220;<a class="reference external" href="https://api.validic.com/">https://api.validic.com/</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="https://api.validic.com/">https://api.validic.com/</a>&#8221;, &#8220;v1&#8221;), &#8220;<a class="reference external" href="https://api.validic.com/v1">https://api.validic.com/v1</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="https://api.validic.com/">https://api.validic.com/</a>&#8221;, &#8220;v1&#8221;, &#8220;organizations&#8221;), &#8220;<a class="reference external" href="https://api.validic.com/v1/organizations">https://api.validic.com/v1/organizations</a>&#8221;)</p>
+<p class="last">self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="https://api.validic.com">https://api.validic.com</a>&#8221;), &#8220;<a class="reference external" href="https://api.validic.com/">https://api.validic.com/</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="https://api.validic.com">https://api.validic.com</a>&#8221;, &#8220;v1&#8221;), &#8220;<a class="reference external" href="https://api.validic.com/v1">https://api.validic.com/v1</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="https://api.validic.com">https://api.validic.com</a>&#8221;, &#8220;v1&#8221;, &#8220;organizations&#8221;), &#8220;<a class="reference external" href="https://api.validic.com/v1/organizations">https://api.validic.com/v1/organizations</a>&#8221;)</p>
+</dd>
+<dt>def test_url_join_http_port(self):</dt>
+<dd>self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com:80/">http://api.validic.com:80/</a>&#8221;), &#8220;<a class="reference external" href="http://api.validic.com:80/">http://api.validic.com:80/</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com:80/">http://api.validic.com:80/</a>&#8221;, &#8220;v1&#8221;), &#8220;<a class="reference external" href="http://api.validic.com:80/v1">http://api.validic.com:80/v1</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com:80/">http://api.validic.com:80/</a>&#8221;, &#8220;v1&#8221;, &#8220;organizations&#8221;), &#8220;<a class="reference external" href="http://api.validic.com:80/v1/organizations">http://api.validic.com:80/v1/organizations</a>&#8221;)</dd>
+<dt>def test_url_join_https_port(self):</dt>
+<dd>self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="https://api.validic.com:443/">https://api.validic.com:443/</a>&#8221;), &#8220;<a class="reference external" href="https://api.validic.com:443/">https://api.validic.com:443/</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="https://api.validic.com:443/">https://api.validic.com:443/</a>&#8221;, &#8220;v1&#8221;), &#8220;<a class="reference external" href="https://api.validic.com:443/v1">https://api.validic.com:443/v1</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="https://api.validic.com:443/">https://api.validic.com:443/</a>&#8221;, &#8220;v1&#8221;, &#8220;organizations&#8221;), &#8220;<a class="reference external" href="https://api.validic.com:443/v1/organizations">https://api.validic.com:443/v1/organizations</a>&#8221;)</dd>
+<dt>def test_url_join_path(self):</dt>
+<dd><p class="first">self.assertEqual(slumber.url_join(&#8220;/&#8221;), &#8220;/&#8221;)
+self.assertEqual(slumber.url_join(&#8220;/&#8221;, &#8220;v1&#8221;), &#8220;/v1&#8221;)
+self.assertEqual(slumber.url_join(&#8220;/&#8221;, &#8220;v1&#8221;, &#8220;organizations&#8221;), &#8220;/v1/organizations&#8221;)</p>
+<p class="last">self.assertEqual(slumber.url_join(&#8220;/v1/&#8221;), &#8220;/v1/&#8221;)
+self.assertEqual(slumber.url_join(&#8220;/v1/&#8221;, &#8220;organizations&#8221;), &#8220;/v1/organizations&#8221;)
+self.assertEqual(slumber.url_join(&#8220;/v1/&#8221;, &#8220;organizations&#8221;, self.settings.getOrgId()), &#8220;/v1/organizations/&#8221;+self.settings.getOrgId())</p>
+</dd>
+<dt>def test_url_join_trailing_slash(self):</dt>
+<dd>self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com/">http://api.validic.com/</a>&#8221;, &#8220;v1/&#8221;), &#8220;<a class="reference external" href="http://api.validic.com/v1/">http://api.validic.com/v1/</a>&#8221;)
+self.assertEqual(slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com/">http://api.validic.com/</a>&#8221;, &#8220;v1/&#8221;, &#8220;organizations/&#8221;), &#8220;<a class="reference external" href="http://api.validic.com/v1/organizations/">http://api.validic.com/v1/organizations/</a>&#8221;)</dd>
+<dt>def test_url_join_encoded_unicode(self):</dt>
+<dd><p class="first">expected = &#8220;<a class="reference external" href="http://api.validic.com/t?st/">http://api.validic.com/t?st/</a>&#8220;</p>
+<p>url = slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com/">http://api.validic.com/</a>&#8221;, &#8220;t?st/&#8221;)
+self.assertEqual(url, expected)</p>
+<p class="last">url = slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com/">http://api.validic.com/</a>&#8221;, &#8220;t?st/&#8221;.decode(&#8216;utf8&#8217;).encode(&#8216;utf8&#8217;))
+self.assertEqual(url, expected)</p>
+</dd>
+<dt>def test_url_join_decoded_unicode(self):</dt>
+<dd>url = slumber.url_join(&#8220;<a class="reference external" href="http://api.validic.com/">http://api.validic.com/</a>&#8221;, &#8220;t?st/&#8221;.decode(&#8216;utf8&#8217;))
+expected = &#8220;<a class="reference external" href="http://api.validic.com/t?st/">http://api.validic.com/t?st/</a>&#8221;.decode(&#8216;utf8&#8217;)
+self.assertEqual(url, expected)</dd>
+</dl>
+</dd>
+<dt>class ResourceTests(unittest.TestCase):</dt>
+<dd><p class="first">client = Client()
+settings = client.init(&#8220;test&#8221;)
+def test_serializer(self):</p>
+<blockquote>
+<div><p>s = slumber.serialize.Serializer()</p>
+<dl class="docutils">
+<dt>for content_type in [</dt>
+<dd><blockquote class="first">
+<div><blockquote>
+<div>&#8220;application/json&#8221;,
+&#8220;application/x-javascript&#8221;,
+&#8220;text/javascript&#8221;,
+&#8220;text/x-javascript&#8221;,
+&#8220;text/x-json&#8221;,</div></blockquote>
+<p>]:</p>
+</div></blockquote>
+<p class="last">serializer = s.get_serializer(content_type=content_type)</p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="last docutils">
+<dt>def setUp(self):</dt>
+<dd><p class="first">self.base_resource = slumber.Resource(base_url=&#8221;<a class="reference external" href="http://api.validic.com/api/v1/organizations/">http://api.validic.com/api/v1/organizations/</a>&#8220;+ self.settings.getOrgId(), format=&#8221;json&#8221;, append_slash=False, access_token = self.settings.getAccessToken())</p>
+<p class="last">self.settings = configController.configClient(&#8220;test&#8221;)</p>
+</dd>
+<dt>def test_get_200_json(self):</dt>
+<dd><p class="first">r = mock.Mock(spec=requests.Response)
+r.status_code = 200
+r.headers = {&#8220;content-type&#8221;: &#8220;application/json&#8221;}
+r.content = &#8216;{&#8220;summary&#8221;:{&#8220;status&#8221;:200,&#8221;message&#8221;:&#8221;Ok&#8221;,&#8221;results&#8221;:1,&#8221;start_date&#8221;:null,&#8221;end_date&#8221;:null,&#8221;offset&#8221;:0,&#8221;limit&#8221;:100,&#8221;params&#8221;:{&#8220;start_date&#8221;:null,&#8221;end_date&#8221;:null,&#8221;offset&#8221;:null,&#8221;limit&#8221;:null,&#8221;source&#8221;:null}},&#8221;organization&#8221;:{&#8220;_id&#8221;:&#8221;51aca5a06dedda916400002b&#8221;,&#8221;name&#8221;:&#8221;ACME Corp&#8221;,&#8221;users&#8221;:78,&#8221;users_provisioned&#8221;:514,&#8221;activities&#8221;:197527,&#8221;connections&#8221;:317,&#8221;organizations&#8221;:[]}}&#8217;</p>
+<dl class="docutils">
+<dt>self.base_resource._store.update({</dt>
+<dd>&#8220;session&#8221;: mock.Mock(spec=requests.Session),
+&#8220;serializer&#8221;: slumber.serialize.Serializer(),</dd>
+</dl>
+<p>})
+self.base_resource._store[&#8220;session&#8221;].request.return_value = r</p>
+<p>resp = self.base_resource._request(&#8220;GET&#8221;)</p>
+<p>self.assertTrue(resp is r)
+self.assertEqual(resp.content, r.content)</p>
+<dl class="docutils">
+<dt>self.base_resource._store[&#8220;session&#8221;].request.assert_called_once_with(</dt>
+<dd>&#8220;GET&#8221;,
+self.getBaseUrl(),
+data=None,
+files=None,
+params=None,
+headers={&#8220;content-type&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type(), &#8220;accept&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type()}</dd>
+</dl>
+<p>)</p>
+<p class="last">resp = self.base_resource.get()
+self.assertEqual(resp[&#8216;summary&#8217;], {u&#8217;status&#8217;: 200, u&#8217;end_date&#8217;: None, u&#8217;results&#8217;: 1, u&#8217;limit&#8217;: 100, u&#8217;offset&#8217;: 0, u&#8217;params&#8217;: {u&#8217;source&#8217;: None, u&#8217;limit&#8217;: None, u&#8217;start_date&#8217;: None, u&#8217;end_date&#8217;: None, u&#8217;offset&#8217;: None}, u&#8217;message&#8217;: u&#8217;Ok&#8217;, u&#8217;start_date&#8217;: None})</p>
+</dd>
+<dt>def getBaseUrl(self):</dt>
+<dd>return &#8220;<a class="reference external" href="http://api.validic.com/api/v1/organizations/">http://api.validic.com/api/v1/organizations/</a>&#8220;+ self.settings.getOrgId()</dd>
+<dt>def test_get_200_text(self):</dt>
+<dd><p class="first">r = mock.Mock(spec=requests.Response)
+r.status_code = 200
+r.headers = {&#8220;content-type&#8221;: &#8220;text/plain&#8221;}
+r.content = &#8220;Mocked Content&#8221;</p>
+<dl class="docutils">
+<dt>self.base_resource._store.update({</dt>
+<dd>&#8220;session&#8221;: mock.Mock(spec=requests.Session),
+&#8220;serializer&#8221;: slumber.serialize.Serializer(),</dd>
+</dl>
+<p>})
+self.base_resource._store[&#8220;session&#8221;].request.return_value = r</p>
+<p>resp = self.base_resource._request(&#8220;GET&#8221;)</p>
+<p>self.assertTrue(resp is r)
+self.assertEqual(resp.content, &#8220;Mocked Content&#8221;)</p>
+<dl class="docutils">
+<dt>self.base_resource._store[&#8220;session&#8221;].request.assert_called_once_with(</dt>
+<dd>&#8220;GET&#8221;,
+self.getBaseUrl(),
+data=None,
+files=None,
+params=None,
+headers={&#8220;content-type&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type(), &#8220;accept&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type()}</dd>
+</dl>
+<p>)</p>
+<p class="last">resp = self.base_resource.get()
+self.assertEqual(resp, r.content)</p>
+</dd>
+<dt>def test_post_201_redirect(self):</dt>
+<dd><p class="first">r1 = mock.Mock(spec=requests.Response)
+r1.status_code = 201
+r1.headers = {&#8220;location&#8221;: self.getBaseUrl()+&#8221;/1&#8221;}
+r1.content = &#8216;&#8217;</p>
+<p>r2 = mock.Mock(spec=requests.Response)
+r2.status_code = 200
+r2.headers = {&#8220;content-type&#8221;: &#8220;application/json&#8221;}
+r2.content = &#8216;{&#8220;result&#8221;: [&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;]}&#8217;</p>
+<dl class="docutils">
+<dt>self.base_resource._store.update({</dt>
+<dd>&#8220;session&#8221;: mock.Mock(spec=requests.Session),
+&#8220;serializer&#8221;: slumber.serialize.Serializer(),</dd>
+</dl>
+<p>})
+self.base_resource._store[&#8220;session&#8221;].request.side_effect = (r1, r2)</p>
+<p>resp = self.base_resource._request(&#8220;POST&#8221;)</p>
+<p>self.assertTrue(resp is r1)
+self.assertEqual(resp.content, r1.content)</p>
+<dl class="docutils">
+<dt>self.base_resource._store[&#8220;session&#8221;].request.assert_called_once_with(</dt>
+<dd>&#8220;POST&#8221;,
+self.getBaseUrl(),
+data=None,
+files=None,
+params=None,
+headers={&#8220;content-type&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type(), &#8220;accept&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type()}</dd>
+</dl>
+<p>)</p>
+<p class="last">resp = self.base_resource.post(data={&#8216;foo&#8217;: &#8216;bar&#8217;})
+self.assertEqual(resp[&#8216;result&#8217;], [&#8216;a&#8217;, &#8216;b&#8217;, &#8216;c&#8217;])</p>
+</dd>
+<dt>def test_post_decodable_response(self):</dt>
+<dd><p class="first">r = mock.Mock(spec=requests.Response)
+r.status_code = 200
+r.content = &#8216;{&#8220;result&#8221;: [&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;]}&#8217;
+r.headers = {&#8220;content-type&#8221;: &#8220;application/json&#8221;}</p>
+<dl class="docutils">
+<dt>self.base_resource._store.update({</dt>
+<dd>&#8220;session&#8221;: mock.Mock(spec=requests.Session),
+&#8220;serializer&#8221;: slumber.serialize.Serializer(),</dd>
+</dl>
+<p>})
+self.base_resource._store[&#8220;session&#8221;].request.return_value = r</p>
+<p>resp = self.base_resource._request(&#8220;POST&#8221;)</p>
+<p>self.assertTrue(resp is r)
+self.assertEqual(resp.content, r.content)</p>
+<dl class="docutils">
+<dt>self.base_resource._store[&#8220;session&#8221;].request.assert_called_once_with(</dt>
+<dd>&#8220;POST&#8221;,
+self.getBaseUrl(),
+data=None,
+files=None,
+params=None,
+headers={&#8220;content-type&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type(), &#8220;accept&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type()}</dd>
+</dl>
+<p>)</p>
+<p class="last">resp = self.base_resource.post(data={&#8216;foo&#8217;: &#8216;bar&#8217;})
+self.assertEqual(resp[&#8216;result&#8217;], [&#8216;a&#8217;, &#8216;b&#8217;, &#8216;c&#8217;])</p>
+</dd>
+<dt>def test_patch_201_redirect(self):</dt>
+<dd><p class="first">r1 = mock.Mock(spec=requests.Response)
+r1.status_code = 201
+r1.headers = {&#8220;location&#8221;: self.getBaseUrl()+&#8221;/1&#8221;}
+r1.content = &#8216;&#8217;</p>
+<p>r2 = mock.Mock(spec=requests.Response)
+r2.status_code = 200
+r2.headers = {&#8220;content-type&#8221;: &#8220;application/json&#8221;}
+r2.content = &#8216;{&#8220;result&#8221;: [&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;]}&#8217;</p>
+<dl class="docutils">
+<dt>self.base_resource._store.update({</dt>
+<dd>&#8220;session&#8221;: mock.Mock(spec=requests.Session),
+&#8220;serializer&#8221;: slumber.serialize.Serializer(),</dd>
+</dl>
+<p>})
+self.base_resource._store[&#8220;session&#8221;].request.side_effect = (r1, r2)</p>
+<p>resp = self.base_resource._request(&#8220;PATCH&#8221;)</p>
+<p>self.assertTrue(resp is r1)
+self.assertEqual(resp.content, r1.content)</p>
+<dl class="docutils">
+<dt>self.base_resource._store[&#8220;session&#8221;].request.assert_called_once_with(</dt>
+<dd>&#8220;PATCH&#8221;,
+self.getBaseUrl(),
+data=None,
+files=None,
+params=None,
+headers={&#8220;content-type&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type(), &#8220;accept&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type()}</dd>
+</dl>
+<p>)</p>
+<p class="last">resp = self.base_resource.patch(data={&#8216;foo&#8217;: &#8216;bar&#8217;})
+self.assertEqual(resp[&#8216;result&#8217;], [&#8216;a&#8217;, &#8216;b&#8217;, &#8216;c&#8217;])</p>
+</dd>
+<dt>def test_patch_decodable_response(self):</dt>
+<dd><p class="first">r = mock.Mock(spec=requests.Response)
+r.status_code = 200
+r.content = &#8216;{&#8220;result&#8221;: [&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;]}&#8217;
+r.headers = {&#8220;content-type&#8221;: &#8220;application/json&#8221;}</p>
+<dl class="docutils">
+<dt>self.base_resource._store.update({</dt>
+<dd>&#8220;session&#8221;: mock.Mock(spec=requests.Session),
+&#8220;serializer&#8221;: slumber.serialize.Serializer(),</dd>
+</dl>
+<p>})
+self.base_resource._store[&#8220;session&#8221;].request.return_value = r</p>
+<p>resp = self.base_resource._request(&#8220;PATCH&#8221;)</p>
+<p>self.assertTrue(resp is r)
+self.assertEqual(resp.content, r.content)</p>
+<dl class="docutils">
+<dt>self.base_resource._store[&#8220;session&#8221;].request.assert_called_once_with(</dt>
+<dd>&#8220;PATCH&#8221;,
+self.getBaseUrl(),
+data=None,
+files=None,
+params=None,
+headers={&#8220;content-type&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type(), &#8220;accept&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type()}</dd>
+</dl>
+<p>)</p>
+<p class="last">resp = self.base_resource.patch(data={&#8216;foo&#8217;: &#8216;bar&#8217;})
+self.assertEqual(resp[&#8216;result&#8217;], [&#8216;a&#8217;, &#8216;b&#8217;, &#8216;c&#8217;])</p>
+</dd>
+<dt>def test_put_201_redirect(self):</dt>
+<dd><p class="first">r1 = mock.Mock(spec=requests.Response)
+r1.status_code = 201
+r1.headers = {&#8220;location&#8221;: self.getBaseUrl()+&#8221;/1&#8221;}
+r1.content = &#8216;&#8217;</p>
+<p>r2 = mock.Mock(spec=requests.Response)
+r2.status_code = 200
+r2.headers = {&#8220;content-type&#8221;: &#8220;application/json&#8221;}
+r2.content = &#8216;{&#8220;result&#8221;: [&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;]}&#8217;</p>
+<dl class="docutils">
+<dt>self.base_resource._store.update({</dt>
+<dd>&#8220;session&#8221;: mock.Mock(spec=requests.Session),
+&#8220;serializer&#8221;: slumber.serialize.Serializer(),</dd>
+</dl>
+<p>})
+self.base_resource._store[&#8220;session&#8221;].request.side_effect = (r1, r2)</p>
+<p>resp = self.base_resource._request(&#8220;PUT&#8221;)</p>
+<p>self.assertTrue(resp is r1)
+self.assertEqual(resp.content, r1.content)</p>
+<dl class="docutils">
+<dt>self.base_resource._store[&#8220;session&#8221;].request.assert_called_once_with(</dt>
+<dd>&#8220;PUT&#8221;,
+self.getBaseUrl(),
+data=None,
+files=None,
+params=None,
+headers={&#8220;content-type&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type(), &#8220;accept&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type()}</dd>
+</dl>
+<p>)</p>
+<p class="last">resp = self.base_resource.put(data={&#8216;foo&#8217;: &#8216;bar&#8217;})
+self.assertEqual(resp[&#8216;result&#8217;], [&#8216;a&#8217;, &#8216;b&#8217;, &#8216;c&#8217;])</p>
+</dd>
+<dt>def test_put_decodable_response(self):</dt>
+<dd><p class="first">r = mock.Mock(spec=requests.Response)
+r.status_code = 200
+r.content = &#8216;{&#8220;result&#8221;: [&#8220;a&#8221;, &#8220;b&#8221;, &#8220;c&#8221;]}&#8217;
+r.headers = {&#8220;content-type&#8221;: &#8220;application/json&#8221;}</p>
+<dl class="docutils">
+<dt>self.base_resource._store.update({</dt>
+<dd>&#8220;session&#8221;: mock.Mock(spec=requests.Session),
+&#8220;serializer&#8221;: slumber.serialize.Serializer(),</dd>
+</dl>
+<p>})
+self.base_resource._store[&#8220;session&#8221;].request.return_value = r</p>
+<p>resp = self.base_resource._request(&#8220;PUT&#8221;)</p>
+<p>self.assertTrue(resp is r)
+self.assertEqual(resp.content, r.content)</p>
+<dl class="docutils">
+<dt>self.base_resource._store[&#8220;session&#8221;].request.assert_called_once_with(</dt>
+<dd>&#8220;PUT&#8221;,
+self.getBaseUrl(),
+data=None,
+files=None,
+params=None,
+headers={&#8220;content-type&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type(), &#8220;accept&#8221;: self.base_resource._store[&#8220;serializer&#8221;].get_content_type()}</dd>
+</dl>
+<p>)</p>
+<p class="last">resp = self.base_resource.put(data={&#8216;foo&#8217;: &#8216;bar&#8217;})
+self.assertEqual(resp[&#8216;result&#8217;], [&#8216;a&#8217;, &#8216;b&#8217;, &#8216;c&#8217;])</p>
+</dd>
+<dt>def test_handle_serialization(self):</dt>
+<dd><dl class="first docutils">
+<dt>self.base_resource._store.update({</dt>
+<dd>&#8220;serializer&#8221;: slumber.serialize.Serializer(),</dd>
+</dl>
+<p>})</p>
+<p>resp = mock.Mock(spec=requests.Response)
+resp.headers = {&#8220;content-type&#8221;: &#8220;application/json; charset=utf-8&#8221;}
+resp.content = &#8216;{&#8220;foo&#8221;: &#8220;bar&#8221;}&#8217;</p>
+<p>r = self.base_resource._try_to_serialize_response(resp)</p>
+<dl class="last docutils">
+<dt>if not isinstance(r, dict):</dt>
+<dd>self.fail(&#8220;Serialization did not take place&#8221;)</dd>
+</dl>
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/tests.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">VPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Keshav.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

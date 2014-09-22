@@ -1,0 +1,406 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; VPy 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="VPy 1.0 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="index.html">VPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <p>import slumber
+import configController
+import json
+import Filter
+from slumber.serialize import BaseSerializer
+from slumber import serialize</p>
+<dl class="docutils">
+<dt>class FilteredSerializer(BaseSerializer):</dt>
+<dd><p class="first">key = &#8220;jsonFiltered&#8221;
+content_types = [</p>
+<blockquote>
+<div><blockquote>
+<div>&#8220;application/json&#8221;,
+&#8220;application/x-javascript&#8221;,
+&#8220;text/javascript&#8221;,
+&#8220;text/x-javascript&#8221;,
+&#8220;text/x-json&#8221;,</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<dl class="last docutils">
+<dt>def loads(self, data):</dt>
+<dd>return json.loads(data)</dd>
+<dt>def dumps(self, data):</dt>
+<dd>return json.dumps(data)</dd>
+</dl>
+</dd>
+<dt>class Client():</dt>
+<dd><p class="first">settings = configController.configClient(&#8220;test&#8221;) ##Default</p>
+<dl class="docutils">
+<dt>s = serialize.Serializer(</dt>
+<dd><blockquote class="first">
+<div><p>default=&#8221;jsonFiltered&#8221;,
+serializers=[</p>
+<blockquote>
+<div>serialize.JsonSerializer(),
+serialize.YamlSerializer(),
+FilteredSerializer(),</div></blockquote>
+<p>]</p>
+</div></blockquote>
+<p class="last">)</p>
+</dd>
+</dl>
+<p>api = slumber.API(settings.getApi(),  append_slash = False, format = &#8220;jsonFiltered&#8221;, serializer=s)
+orgId = settings.getOrgId() ##Default
+token = settings.getAccessToken() ##Default
+user = settings.getUser() ##Default</p>
+<dl class="docutils">
+<dt>def init(self, mode):</dt>
+<dd>self.settings = configController.configClient(mode)
+orgId = self.settings.getOrgId()
+token = self.settings.getAccessToken()
+user = self.settings.getUser()
+self.orgId = self.settings.getOrgId()
+self.token = self.settings.getAccessToken()
+self.user = self.settings.getUser()
+self.filter_dict = {&#8220;access_token&#8221; : self.token}
+return self.settings</dd>
+<dt>def Filtered(self, <a href="#id1"><span class="problematic" id="id2">**</span></a>kwargs):</dt>
+<dd>kwargs[&#8220;access_token&#8221;] = self.token
+self.filter_dict = kwargs
+return self</dd>
+<dt>def getMyOrganizationInfo(self):</dt>
+<dd>response = self.api.organizations(self.orgId).get(<a href="#id3"><span class="problematic" id="id4">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def getOrganizationInfo(self,orgId):</dt>
+<dd>response = self.api.organizations(orgId).get(<a href="#id5"><span class="problematic" id="id6">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def getMyUsers(self):</dt>
+<dd>response = self.api.organizations(self.orgId).users.get(<a href="#id7"><span class="problematic" id="id8">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def getUser(self,userId):</dt>
+<dd>response = self.api.organizations(self.orgId).users(userId).get(<a href="#id9"><span class="problematic" id="id10">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def refreshUserAccessToken(self,studentId):</dt>
+<dd>response = self.api.organizations(self.orgId).users(studentId).refresh_token.get(<a href="#id11"><span class="problematic" id="id12">**</span></a>self.filter_dict)
+return response[&#8220;user&#8221;]</dd>
+<dt>def getUserProfile(self,token):</dt>
+<dd>response = self.api.profile.get(authentication_token = token)
+return response[&#8220;profile&#8221;]</dd>
+<dt>def suspendUser(self,userid):</dt>
+<dd>response = self.api.organizations(self.orgId).users(userid).put({ &#8220;suspend&#8221;: &#8220;1&#8221;, &#8220;access_token&#8221;: self.token })
+return response</dd>
+<dt>def getUserStorefrontUrl(self,token):</dt>
+<dd>return slumber.url_join(&#8220;<a class="reference external" href="https://app.validic.com/">https://app.validic.com/</a>&#8221;,self.orgId,token)</dd>
+<dt>def getFitness(self, userid):</dt>
+<dd>response = self.api.organizations(self.orgId).users(userid).fitness.get(<a href="#id13"><span class="problematic" id="id14">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def getRoutine(self, userid):</dt>
+<dd>response = self.api.organizations(self.orgId).users(userid).routine.get(<a href="#id15"><span class="problematic" id="id16">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def getNutrition(self, userid):</dt>
+<dd>response = self.api.organizations(self.orgId).users(userid).nutrition.get(<a href="#id17"><span class="problematic" id="id18">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def getSleep(self, userid):</dt>
+<dd>response = self.api.organizations(self.orgId).users(userid).sleep.get(<a href="#id19"><span class="problematic" id="id20">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def getWeight(self, userid):</dt>
+<dd>response = self.api.organizations(self.orgId).users(userid).weight.get(<a href="#id21"><span class="problematic" id="id22">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def getDiabetesMeasurements(self,userid):</dt>
+<dd>response = self.api.organizations(self.orgId).users(userid).diabetes.get(<a href="#id23"><span class="problematic" id="id24">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def getBiometricMeasurements(self,userid):</dt>
+<dd>response = self.api.organizations(self.orgId).users(userid).biometrics.get(<a href="#id25"><span class="problematic" id="id26">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def getTobaccoCessation(self,userid):</dt>
+<dd>response = self.api.organizations(self.orgId).users(userid).tobacco_cessation.get(<a href="#id27"><span class="problematic" id="id28">**</span></a>self.filter_dict)
+return response</dd>
+<dt>def unSuspendUser(self,userId):</dt>
+<dd>response = self.api.organizations(self.orgId).users(userId).put({ &#8220;suspend&#8221;: &#8220;0&#8221;, &#8220;access_token&#8221;: self.token })
+return response</dd>
+<dt>def deleteAllUsers(self):</dt>
+<dd><p class="first">response = self.getMyUsers()
+for user in response[&#8220;users&#8221;]:</p>
+<blockquote class="last">
+<div><dl class="docutils">
+<dt>try:</dt>
+<dd>self.deleteUser(user[&#8220;_id&#8221;].encode(&#8216;utf-8&#8217;))</dd>
+<dt>except Exception:</dt>
+<dd>continue #Probably trying to delete a user that cannot be deleted so lets skip</dd>
+</dl>
+</div></blockquote>
+</dd>
+<dt>def deleteUser(self, userId):</dt>
+<dd><dl class="first docutils">
+<dt>try:</dt>
+<dd>self.api.organizations(self.orgId).users(userId).delete(access_token = self.token)</dd>
+<dt>except Exception:</dt>
+<dd>pass</dd>
+</dl>
+<p class="last">response = userId;</p>
+</dd>
+<dt>def addUser(self, userid):</dt>
+<dd>payload = {  &#8220;user&#8221;: { &#8220;uid&#8221;: userid  },&#8221;access_token&#8221;: self.settings.getAccessToken()}
+response = self.api.organizations(self.settings.getOrgId()).users.post(payload)
+return response</dd>
+<dt>def addUserWithProfile(self, userid, profile):</dt>
+<dd>payload = {  &#8220;user&#8221;: { &#8220;uid&#8221;: userid, &#8220;profile&#8221;:{ &#8220;gender&#8221;: profile.gender, &#8220;location&#8221;: profile.location, &#8220;birth_year&#8221;: profile.birthyear, &#8220;height&#8221;: profile.height, &#8220;weight&#8221;: profile.weight } },&#8221;access_token&#8221;: self.settings.getAccessToken()}
+response = self.api.organizations(self.settings.getOrgId()).users.post(payload)
+return response</dd>
+<dt>def addFitness(self, userId, fitness):</dt>
+<dd>payload = self.populateFitness(fitness)
+response = self.api.organizations(self.settings.getOrgId()).users(userId).fitness().post(payload)
+return response</dd>
+<dt>def populateFitness(self, fitness):</dt>
+<dd>return { &#8220;fitness&#8221;:{ &#8220;timestamp&#8221;: fitness.timestamp,&#8221;utc_offset&#8221;: fitness.utc_offset, &#8220;type&#8221;: fitness.type, &#8220;intensity&#8221;: fitness.intensity,&#8221;start_time&#8221;: fitness.start_time,&#8221;distance&#8221;: fitness.distance,&#8221;duration&#8221;: fitness.duration,&#8221;calories&#8221;: fitness.calories,&#8221;activity_id&#8221;: fitness.activity_id },&#8221;access_token&#8221;: self.settings.getAccessToken()}</dd>
+<dt>def addRoutine(self, userid, routine):</dt>
+<dd>payload = self.populateRoutine(routine)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).routine().post(payload)
+return response</dd>
+<dt>def populateRoutine(self, routine):</dt>
+<dd>return { &#8220;routine&#8221;:{ &#8220;timestamp&#8221;: routine.timestamp, &#8220;utc_offset&#8221;: routine.utc_offset, &#8220;steps&#8221;: routine.steps, &#8220;distance&#8221;: routine.distance, &#8220;floors&#8221;: routine.floors, &#8220;elevation&#8221;: routine.elevation, &#8220;calories_burned&#8221;: routine.calories_burned, &#8220;activity_id&#8221;: routine.activity_id },&#8221;access_token&#8221;: self.settings.getAccessToken()}</dd>
+<dt>def addNutrition(self, userid, nutrition):</dt>
+<dd>payload = self.populateNutrition(nutrition)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).nutrition().post(payload)
+return response</dd>
+<dt>def populateNutrition(self, nutrition):</dt>
+<dd>return { &#8220;nutrition&#8221;:{ &#8220;timestamp&#8221;: nutrition.timestamp, &#8220;utc_offset&#8221;: nutrition.utc_offset, &#8220;calories&#8221;: nutrition.calories, &#8220;carbohydrates&#8221;: nutrition.carbohydrates, &#8220;fat&#8221;: nutrition.fat, &#8220;fiber&#8221;: nutrition.fiber, &#8220;protein&#8221;: nutrition.protein, &#8220;sodium&#8221;: nutrition.sodium, &#8220;water&#8221;: nutrition.water, &#8220;meal&#8221;: nutrition.meal, &#8220;entry_id&#8221;: nutrition.entry_id },&#8221;access_token&#8221;: self.settings.getAccessToken()}</dd>
+<dt>def addSleep(self, userid, sleep):</dt>
+<dd>payload = self.populateSleep(sleep)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).sleep().post(payload)
+return response</dd>
+<dt>def populateSleep(self, sleep):</dt>
+<dd>return { &#8220;sleep&#8221;:{ &#8220;timestamp&#8221;: sleep.timestamp, &#8220;utc_offset&#8221;: sleep.utc_offset, &#8220;total_sleep&#8221;: sleep.total_sleep, &#8220;awake&#8221;: sleep.awake, &#8220;deep&#8221;: sleep.deep, &#8220;light&#8221;: sleep.light, &#8220;rem&#8221;: sleep.rem, &#8220;times_woken&#8221;: sleep.times_woken, &#8220;activity_id&#8221;: sleep.activity_id },&#8221;access_token&#8221;: self.settings.getAccessToken()}</dd>
+<dt>def addWeight(self, userid, weight):</dt>
+<dd>payload = self.populateWeight(weight)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).weight().post(payload)
+return response</dd>
+<dt>def populateWeight(self, weight):</dt>
+<dd>return { &#8220;weight&#8221;:{ &#8220;timestamp&#8221;: weight.timestamp, &#8220;utc_offset&#8221;: weight.utc_offset, &#8220;weight&#8221;: weight.weight, &#8220;height&#8221;: weight.height, &#8220;free_mass&#8221;: weight.free_mass, &#8220;fat_percent&#8221;: weight.fat_percent, &#8220;mass_weight&#8221;: weight.mass_weight, &#8220;bmi&#8221;: weight.bmi, &#8220;data_id&#8221;: weight.data_id },&#8221;access_token&#8221;: self.settings.getAccessToken()}</dd>
+<dt>def addDiabetes(self, userid, diabetes):</dt>
+<dd>payload = self.populateDiabetes(diabetes)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).diabetes().post(payload)
+return response</dd>
+<dt>def populateDiabetes(self, diabetes):</dt>
+<dd>return { &#8220;diabetes&#8221;:{ &#8220;timestamp&#8221;: diabetes.timestamp, &#8220;utc_offset&#8221;: diabetes.utc_offset, &#8220;c_peptide&#8221;: diabetes.c_peptide, &#8220;fasting_plasma_glucose_test&#8221;: diabetes.fasting_plasma_glucose_test, &#8220;hba1c&#8221;: diabetes.hba1c, &#8220;insulin&#8221;: diabetes.insulin, &#8220;oral_glucose_tolerance_test&#8221;: diabetes.oral_glucose_tolerance_test, &#8220;random_plasma_glucose_test&#8221;: diabetes.random_plasma_glucose_test, &#8220;triglyceride&#8221;: diabetes.triglyceride, &#8220;blood_glucose&#8221;: diabetes.blood_glucose, &#8220;activity_id&#8221;: diabetes.activity_id },&#8221;access_token&#8221;: self.settings.getAccessToken()}</dd>
+<dt>def addBiometrics(self, userid, biometrics):</dt>
+<dd>payload = self.populateBiometrics(biometrics)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).biometrics().post(payload)
+return response</dd>
+<dt>def populateBiometrics(self, biometrics):</dt>
+<dd>return { &#8220;biometrics&#8221;:{  &#8220;timestamp&#8221;: biometrics.timestamp, &#8220;utc_offset&#8221;: biometrics.utc_offset, &#8220;blood_calcium&#8221;: biometrics.blood_calcium, &#8220;blood_chromium&#8221;: biometrics.blood_chromium, &#8220;blood_folic_acid&#8221;: biometrics.blood_folic_acid, &#8220;blood_magnesium&#8221;: biometrics.blood_magnesium, &#8220;blood_potassium&#8221;: biometrics.blood_potassium, &#8220;blood_sodium&#8221;: biometrics.blood_sodium, &#8220;blood_vitamin_b12&#8221;: biometrics.blood_vitamin_b12, &#8220;blood_zinc&#8221;: biometrics.blood_zinc, &#8220;creatine_kinase&#8221;: biometrics.creatine_kinase, &#8220;crp&#8221;: biometrics.crp, &#8220;diastolic&#8221;: biometrics.diastolic, &#8220;ferritin&#8221;: biometrics.ferritin,&#8221;hdl&#8221;: biometrics.hdl, &#8220;hscrp&#8221;: biometrics.hscrp, &#8220;il6&#8221;: biometrics.il6, &#8220;ldl&#8221;: biometrics.ldl, &#8220;resting_heartrate&#8221;: biometrics.resting_heartrate, &#8220;systolic&#8221;: biometrics.systolic, &#8220;testosterone&#8221;: biometrics.testosterone, &#8220;total_cholesterol&#8221;: biometrics.total_cholesterol, &#8220;tsh&#8221;: biometrics.tsh,&#8221;uric_acid&#8221;: biometrics.uric_acid,&#8221;vitamin_d&#8221;: biometrics.vitamin_d,&#8221;white_cell_count&#8221;: biometrics.white_cell_count,&#8221;spo2&#8221;: biometrics.spo2,&#8221;temperature&#8221;: biometrics.temperature,&#8221;data_id&#8221;: biometrics.data_id },&#8221;access_token&#8221;: self.settings.getAccessToken()}</dd>
+<dt>def addTobaccoCessation(self, userid, tobacco_cessation):</dt>
+<dd>payload = self.populateTobacco(tobacco_cessation)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).tobacco_cessation().post(payload)
+return response</dd>
+<dt>def populateTobacco(self, tobacco_cessation):</dt>
+<dd>return { &#8220;tobacco_cessation&#8221;:{ &#8220;timestamp&#8221;: tobacco_cessation.timestamp, &#8220;utc_offset&#8221;: tobacco_cessation.utc_offset, &#8220;cigarettes_allowed&#8221;: tobacco_cessation.cigarettes_allowed, &#8220;cigarettes_smoked&#8221;: tobacco_cessation.cigarettes_smoked, &#8220;cravings&#8221;: tobacco_cessation.cravings, &#8220;last_smoked&#8221;: tobacco_cessation.last_smoked },&#8221;access_token&#8221;: self.settings.getAccessToken()}</dd>
+</dl>
+<p>#&#8212;&#8212;&#8212;&#8212;
+def updateFitness(self, userid, fitness, id):</p>
+<blockquote>
+<div>payload = self.populateFitness(fitness)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).fitness(id).put(payload)
+return response</div></blockquote>
+<dl class="docutils">
+<dt>def updateRoutine(self, userid, routine, id):</dt>
+<dd>payload = self.populateRoutine(routine)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).routine(id).put(payload)
+return response</dd>
+<dt>def updateNutrition(self, userid, nutrition, id):</dt>
+<dd>payload = self.populateNutrition(nutrition)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).nutrition(id).put(payload)
+return response</dd>
+<dt>def updateSleep(self, userid, sleep, id):</dt>
+<dd>payload = self.populateSleep(sleep)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).sleep(id).put(payload)
+return response</dd>
+<dt>def updateWeight(self, userid, weight, id):</dt>
+<dd>payload = self.populateWeight(weight)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).weight(id).put(payload)
+return response</dd>
+<dt>def updateDiabetes(self, userid, diabetes, id):</dt>
+<dd>payload = self.populateDiabetes(diabetes)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).diabetes(id).put(payload)
+return response</dd>
+<dt>def updateBiometric(self, userid, biometrics, id):</dt>
+<dd>payload = self.populateBiometrics(biometrics)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).biometrics(id).put(payload)
+return response</dd>
+<dt>def updateTobaccoCessation(self, userid, tobacco_cessation, id):</dt>
+<dd>payload = self.populateTobacco(tobacco_cessation)
+response = self.api.organizations(self.settings.getOrgId()).users(userid).tobacco_cessation(id).put(payload)
+return response</dd>
+</dl>
+<p>#&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8211;Delete
+def deleteFitness(self, userId, Id):</p>
+<blockquote>
+<div><p>response = None
+try:</p>
+<blockquote>
+<div>response = self.api.organizations(self.orgId).users(userId).fitness(Id).delete(<a href="#id29"><span class="problematic" id="id30">**</span></a>self.filter_dict)</div></blockquote>
+<dl class="docutils">
+<dt>except Exception:</dt>
+<dd>pass</dd>
+</dl>
+<p>return response;</p>
+</div></blockquote>
+<dl class="last docutils">
+<dt>def deleteRoutine(self, userId, Id):</dt>
+<dd><p class="first">response = None
+try:</p>
+<blockquote>
+<div>response = self.api.organizations(self.orgId).users(userId).routine(Id).delete(<a href="#id31"><span class="problematic" id="id32">**</span></a>self.filter_dict)</div></blockquote>
+<dl class="docutils">
+<dt>except Exception:</dt>
+<dd>pass</dd>
+</dl>
+<p class="last">return response;</p>
+</dd>
+<dt>def deleteNutrition(self, userId, Id):</dt>
+<dd><p class="first">response = None
+try:</p>
+<blockquote>
+<div>response = self.api.organizations(self.orgId).users(userId).nutrition(Id).delete(<a href="#id33"><span class="problematic" id="id34">**</span></a>self.filter_dict)</div></blockquote>
+<dl class="docutils">
+<dt>except Exception:</dt>
+<dd>pass</dd>
+</dl>
+<p class="last">return response;</p>
+</dd>
+<dt>def deleteSleep(self, userId, Id):</dt>
+<dd><p class="first">response = None
+try:</p>
+<blockquote>
+<div>response = self.api.organizations(self.orgId).users(userId).sleep(Id).delete(<a href="#id35"><span class="problematic" id="id36">**</span></a>self.filter_dict)</div></blockquote>
+<dl class="docutils">
+<dt>except Exception:</dt>
+<dd>pass</dd>
+</dl>
+<p class="last">return response;</p>
+</dd>
+<dt>def deleteWeight(self, userId, Id):</dt>
+<dd><p class="first">response = None
+try:</p>
+<blockquote>
+<div>response = self.api.organizations(self.orgId).users(userId).weight(Id).delete(<a href="#id37"><span class="problematic" id="id38">**</span></a>self.filter_dict)</div></blockquote>
+<dl class="docutils">
+<dt>except Exception:</dt>
+<dd>pass</dd>
+</dl>
+<p class="last">return response;</p>
+</dd>
+<dt>def deleteDiabetes(self, userId, Id):</dt>
+<dd><p class="first">response = None
+try:</p>
+<blockquote>
+<div>response = self.api.organizations(self.orgId).users(userId).diabetes(Id).delete(<a href="#id39"><span class="problematic" id="id40">**</span></a>self.filter_dict)</div></blockquote>
+<dl class="docutils">
+<dt>except Exception:</dt>
+<dd>pass</dd>
+</dl>
+<p class="last">return response;</p>
+</dd>
+<dt>def deleteBiometrics(self, userId, Id):</dt>
+<dd><p class="first">response = None
+try:</p>
+<blockquote>
+<div>response = self.api.organizations(self.orgId).users(userId).biometrics(Id).delete(<a href="#id41"><span class="problematic" id="id42">**</span></a>self.filter_dict)</div></blockquote>
+<dl class="docutils">
+<dt>except Exception:</dt>
+<dd>pass</dd>
+</dl>
+<p class="last">return response;</p>
+</dd>
+<dt>def deleteTobacco(self, userId, Id):</dt>
+<dd><p class="first">response = None
+try:</p>
+<blockquote>
+<div>response = self.api.organizations(self.orgId).users(userId).tobacco_cessation(Id).delete(<a href="#id43"><span class="problematic" id="id44">**</span></a>self.filter_dict)</div></blockquote>
+<dl class="docutils">
+<dt>except Exception:</dt>
+<dd>pass</dd>
+</dl>
+<p class="last">return response;</p>
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/VPy.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="index.html">VPy 1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Keshav.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
